@@ -20,7 +20,7 @@ Handles your PortaleFunebre Obituaries directly from your website..
 
 == Frequently Asked Questions ==
 
-= How Does Wp Necrologi Plugin Work? =
+= How Does Portale Funebre Necrologi Work? =
 
 It offers an API Interface for linking PortaleFunebre directly to your website.
 

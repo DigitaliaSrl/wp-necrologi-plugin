@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Wp Necrologi Plugin
+Plugin Name: Portale Funebre Necrologi
 Plugin URI: http://www.portalefunebre.com
 Description: Gestione dei necrologi sul tuo sito.
 Version: 1.0
