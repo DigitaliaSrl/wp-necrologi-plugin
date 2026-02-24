@@ -329,6 +329,7 @@ a.necrologio-loop,
 **/
 .post-necrologio {
     margin-top: 20px;
+    background-color: var(--dg-necro-colore-page);
 }
 
 .post-necrologio h2.necro-nome-defunto {
@@ -384,12 +385,15 @@ a.necrologio-loop,
     display: block;
     margin: 0 auto;
 }
-.post-necrologio .necro-testo{
+.post-necrologio .necro-testo {
     text-align: justify;
     margin-bottom: 20px;
     font-size: 18px;
     color: #494855;
     font-weight: 350;
+}
+.post-necrologio.foto-massimizzata .necro-testo {
+    padding: 30px 0px;
 }
 .post-necrologio .necro-mappa {
     display: block;
@@ -456,18 +460,21 @@ a.necrologio-loop,
 }
 
 /* share on */
+.post-necrologio .custom-links,
 .post-necrologio .social-share {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid #00000029;
     box-sizing: border-box;
 }
+.post-necrologio .custom-links h5,
 .post-necrologio .social-share h5 {
     margin: 0;
     margin-bottom: 20px;
     font-style: italic;
     color: var(--dg-necro-colore-box);
 }
+.post-necrologio .custom-links a,
 .post-necrologio .social-share a {
     text-decoration: none;
     width: 40px;
@@ -501,6 +508,13 @@ a.necrologio-loop,
 .post-necrologio .layout-default .necro-content {
     width: 30%;
 }
+.post-necrologio.foto-massimizzata .layout-default .necro-content {
+    width: 100%;
+    padding: 20px;
+}
+.post-necrologio.foto-massimizzata .layout-default .necro-content picture {
+    border: 3px solid var(--dg-necro-colore-box);
+}
 .post-necrologio .layout-default .necro-center {
     width: 40%;
 }
@@ -518,14 +532,22 @@ a.necrologio-loop,
 
 /* HERO section */
 .necro-hero-section {
-    padding: 80px 20px;
-    color: #fff;
     text-align: center;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     border-radius: 12px;
+    overflow: hidden;
+}
+.necrohero-inner {
+    padding: 80px 20px;
+    text-align: center;
+    color: #fff;
+    background: #00000070;
+    background: linear-gradient(360deg, #00000082, #4d4d4d17);
+    filter: contrast(1.1);
+    backdrop-filter: blur(1px);
 }
 .necro-hero-section h1 {
     font-size: 3em;

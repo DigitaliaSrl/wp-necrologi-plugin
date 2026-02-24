@@ -74,10 +74,16 @@ class GestioneNecrologi extends Digitalia\PluginBase {
         $slug_singolo = (isset(self::$IMPOSTAZIONI['slug_singolo'])) ? self::$IMPOSTAZIONI['slug_singolo'] : 'necrologio';
 
         add_action('init', function() use ($slug_singolo) {
+            add_rewrite_rule(
+                '^pf-share/([^/]+)/?$',
+                'index.php?pf_share_slug=$matches[1]',
+                'top'
+            );
             add_rewrite_rule('^'.$slug_singolo.'/([^/]+)?', 'index.php?necro_slug=$matches[1]', 'top');
             flush_rewrite_rules(  );
         });
         add_filter('query_vars', function($vars) {
+            $vars[] = 'pf_share_slug';
             $vars[] = 'necro_slug';
             return $vars;
         });
@@ -103,7 +109,7 @@ class GestioneNecrologi extends Digitalia\PluginBase {
                     $wp_query->is_page = true;
                     $wp_query->is_singular = true;
                     $wp_query->is_home = false;
-                    $wp_query->is_404 = false;
+                    $wp_query->is_404  = false;
 
                     $template = get_single_template();
 
@@ -118,6 +124,67 @@ class GestioneNecrologi extends Digitalia\PluginBase {
                     // fallback se non trova nulla
                     wp_die('Pagina non trovata', 'Errore 404', ['response' => 404]);
                 }
+            });
+            add_action('template_redirect', function () {
+
+                $slug = get_query_var('pf_share_slug');
+                if (!$slug) return;
+
+                $api = new PortaleFunebre_API();
+                $data = $api->TrovaNecrologioSingolo($slug);
+
+                if (!$data || (empty($data))) {
+                    wp_die('Not found');
+                }
+
+                $agenzia = (isset($data->agenzia)) ? $data->agenzia : (object)['ragione_sociale' => 'Onoranze Funebri', 'partita_iva'=> ''];
+
+                $thumb = $data->thumbnail;
+                $title = esc_attr($data->nome_defunto).' - '.$agenzia->ragione_sociale;
+                $desc  = wp_strip_all_tags(esc_attr($data->testo));
+                $img   = PortaleFunebre_API::GetImgUrl('').'/'.$thumb;
+
+                if (!$desc) {
+                    $desc = 'E\' mancato/a all\'affetto dei suoi cari '.$data->nome_defunto;
+                }
+                
+                $real_url = esc_url(home_url('/'.self::$IMPOSTAZIONI['slug_singolo'].'/'.$slug));
+
+                ?>
+                <!DOCTYPE html>
+                <html>
+                    <head>
+
+                        <title><?php echo $title; ?></title>
+
+                        <!-- Open Graph / Facebook -->
+                        <meta property="og:title" content="<?php echo $title; ?>" />
+                        <meta property="og:title" content="<?php echo $title; ?>" />
+                        <meta property="og:description" content="<?php echo $desc; ?>" />
+                        <meta property="og:image" content="<?php echo $img; ?>" />
+                        <meta property="og:type" content="article" />
+
+                        <!-- X (Twitter) -->
+                        <meta property="twitter:card" content="<?php echo $title; ?>" />
+                        <meta property="twitter:url" content="<?php echo $real_url; ?>" />
+                        <meta property="twitter:title" content="<?php echo $title; ?>" />
+                        <meta property="twitter:description" content="<?php echo $desc; ?>" />
+                        <meta property="twitter:image" content="<?php echo $img; ?>" />
+
+                        <meta name="msapplication-TileImage" content="<?php echo $img; ?>">
+                        <meta name="robots" content="noindex, nofollow">
+
+                        <meta http-equiv="refresh" content="0;url=<?php echo $real_url; ?>">
+
+                    </head>
+                    <body>
+                        <h1><?php echo $title; ?></h1>
+                        <p><?php echo $desc; ?></p>
+                        <img src="<?php echo $img; ?>"/>
+                    </body>
+                </html>
+                <?php
+                exit;
             });
         }
             

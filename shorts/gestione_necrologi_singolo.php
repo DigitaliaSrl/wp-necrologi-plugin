@@ -6,12 +6,17 @@ if (!GestioneNecrologi::IsConfigurato()) {  echo 'necrologio'; return; }
 
 $impostazioni = GestioneNecrologi::GetImpostazioni();
 
+$slug_singolo    = (isset($impostazioni['slug_singolo']))  ? $impostazioni['slug_singolo'] : 'necrologio';
 $slug_necrologio = get_query_var('necro_slug');
+
+$massimizza_foto = (isset($impostazioni['massimizza_foto']))  ? boolval($impostazioni['massimizza_foto']) : false;
 
 add_filter( 'pre_get_document_title', function( $title ) use ($slug_necrologio) { 
   $strings = explode('-',$slug_necrologio);
   return ucfirst($strings[0]).' '.ucfirst($strings[1]).' - '.get_bloginfo( 'name' );
 });
+
+$colore = (isset($impostazioni['colore_box'])) ? $impostazioni['colore_box'] : '#000000';
 
 $tipo_layout = 'layout-default';
 
@@ -36,6 +41,9 @@ $mostra_come_popup = isset($impostazioni['form_come_popup']) && $impostazioni['f
 if (!$mostra_come_popup) { 
   $classes .= ' no-popup';
 }
+if ($massimizza_foto) {
+  $classes .= ' foto-massimizzata';
+}
 
 $pvcy_link =  (isset($impostazioni['link_gdpr'])) ? $impostazioni['link_gdpr'] : '';
 
@@ -57,8 +65,10 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
 
   <?php if ($titolo_hero || $testo_hero): ?>
       <div class="necro-hero-section" style="background-image: url('<?php echo esc_url($bg_url); ?>')">
-          <?php if ($titolo_hero): ?><h1><?php echo $titolo_hero; ?></h1><?php endif; ?>
-          <?php if ($testo_hero): ?><p><?php echo $testo_hero; ?></p><?php endif; ?>
+          <div class="necrohero-inner">
+            <?php if ($titolo_hero): ?><h1><?php echo $titolo_hero; ?></h1><?php endif; ?>
+            <?php if ($testo_hero): ?><p><?php echo $testo_hero; ?></p><?php endif; ?>
+          </div>
       </div>
   <?php endif; ?>
 
@@ -74,17 +84,29 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
 
     </div>
     
-    <div class="necro-center">
-      
-      <?php if (!$defunto_in_hero && $tipo_layout != 'layout-alt') {?>
-        <h2 class="necro-nome-defunto"></h2>
-      <?php } ?>
+    <?php if (!$massimizza_foto) { ?> 
+      <div class="necro-center">
+        
+        <?php if (!$defunto_in_hero && $tipo_layout != 'layout-alt') {?>
+          <h2 class="necro-nome-defunto"></h2>
+        <?php } ?>
 
-      <div class="necro-testo"></div>
-
-    </div>
+        <div class="necro-testo"></div>
+        
+      </div>
+    <?php } ?>
 
     <div class="necro-dettagli">
+      
+      <?php if ($massimizza_foto) { ?>
+
+        <?php if (!$defunto_in_hero) {?>
+          <h2 class="necro-nome-defunto"></h2>
+        <?php } ?>
+
+        <div class="necro-testo"></div>
+        
+      <?php } ?>
 
       <div class="bottoni-azioni">
 
@@ -100,6 +122,8 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
         </a>
 
       </div>
+
+      <div class="custom-links"></div>
       
 
       <?php if ($share_on_attivo) { ?> 
@@ -111,7 +135,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
           <div class="shs-icon-wrapper">
 
             <?php if ($share_on_fb) { ?> 
-              <a class="share-on fb" href="#", target="_blank">
+              <a class="share-on fb" href="#" target="_blank">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <rect width="24" height="24" fill="none"/>
                   <path d="M5,3H19a2,2,0,0,1,2,2V19a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3M18,5H15.5A3.5,3.5,0,0,0,12,8.5V11H10v3h2v7h3V14h3V11H15V9a1,1,0,0,1,1-1h2Z"/>
@@ -120,7 +144,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
             <?php } ?>
 
             <?php if ($share_on_tw) { ?> 
-              <a class="share-on tw" href="#", target="_blank">
+              <a class="share-on tw" href="#" target="_blank">
                 <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" style="background: #000; margin: 4px" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 509">
                   <rect rx="115.61" ry="115.61"/><path fill="#fff" fill-rule="nonzero" d="M323.74 148.35h36.12l-78.91 90.2 92.83 122.73h-72.69l-56.93-74.43-65.15 74.43h-36.14l84.4-96.47-89.05-116.46h74.53l51.46 68.04 59.53-68.04zm-12.68 191.31h20.02l-129.2-170.82H180.4l130.66 170.82z"/>
                 </svg>
@@ -128,7 +152,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
             <?php } ?>
 
             <?php if ($share_on_wa) { ?> 
-              <a class="share-on wa" href="#", target="_blank">
+              <a class="share-on wa" href="#" data-action="share/whatsapp/share" target="_blank">
                 <svg fill="#000000" version="1.1" id="Icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
                     viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve">
                   <g id="WA_Logo">
@@ -257,11 +281,17 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
         window.location = "<?php echo get_site_url().'/not-found'; ?>";
       }
 
-      let $formCord = $('.cordo-form-wrapper');
+      let agenzia = 'Onoranze Funebri';
 
+      if (cerimonia.agenzia && cerimonia.agenzia.ragione_sociale) {
+        agenzia = cerimonia.agenzia.ragione_sociale;
+      }
+
+      document.title = cerimonia.nome_defunto+' - '+agenzia;
+
+      let $formCord  = $('.cordo-form-wrapper');
       let dati_necro = DgNecrologi.crea_necrologio_singolo(cerimonia);
-
-      let no_PopUp = false;
+      let no_PopUp   = false;
 
       <?php if (!$mostra_come_popup) { ?>
         no_PopUp = true;
@@ -291,6 +321,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
       }
 
       $('.invia-cordoglio').click(function () {
+
         if (no_PopUp) {
           $("html, body").animate({ scrollTop: $('#form-di-cordoglio').offset().top - 70 }, 1000);
           return;
@@ -322,19 +353,24 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
       $('form .invia-a-api').click(function() {
         DgNecrologi.invia_cordoglio($formCord);
       });
-
       
       $('.portale-funebre-post.post-necrologio').fadeIn();
-      
 
-      
-      const pageUrl = encodeURIComponent(window.location.href);
-      const pageTitle = encodeURIComponent(document.title);
+      const shareUrl = "<?php echo get_site_url(); ?>/pf-share/<?php echo $slug_necrologio; ?>";
+
+      if (cerimonia.lista_links && cerimonia.lista_links.length > 0) {
+          let $cusLinkSec = $('div.custom-links');
+          $cusLinkSec.append('<h5>Altri link</h5>');
+          let links = cerimonia.lista_links;
+          for (let i in links) {
+            $cusLinkSec.append('<a href="'+links[i].url+'" target="_blank">'+links[i].testo+'</a>');
+          }
+      }
 
       $('.social-share .shs-icon-wrapper').each(function () {
-        $('.share-on.fb').attr('href',`https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`);
-        $('.share-on.wa').attr('href',`https://wa.me/?text=${pageTitle}%20${pageUrl}`);
-        $('.share-on.tw').attr('href',`https://x.com/intent/post?text=${pageTitle}%20${pageUrl}`);
+        $('.share-on.fb').attr('href',`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`);
+        $('.share-on.wa').attr('href',`https://wa.me/?text=${shareUrl}`);
+        $('.share-on.tw').attr('href',`https://x.com/intent/post?text=${shareUrl}`);
       })
 
         

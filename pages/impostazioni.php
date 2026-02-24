@@ -104,6 +104,7 @@ $titolo_hero     = isset($impostazioni['titolo_hero'])       ? $impostazioni['ti
 $testo_hero      = isset($impostazioni['testo_hero'])        ? $impostazioni['testo_hero'] : 'Invia il tuo messaggio privato di condoglianze direttamente alla famiglia.';
 $sfondo_hero     = isset($impostazioni['sfondo_hero'])       ? $impostazioni['sfondo_hero'] : null;
 $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostazioni['defunto_in_hero']) : false;
+$massimizza_foto = (isset($impostazioni['massimizza_foto'])) ? boolval($impostazioni['massimizza_foto']) : false;
 
 
 if (isset($_POST['cambia_impostazioni'])) {
@@ -146,6 +147,7 @@ if (isset($_POST['cambia_impostazioni'])) {
     $share_on_tw     = (isset($_POST['share_on_tw']) && $_POST['share_on_tw']) ? '1' : '0';
     $share_on_wa     = (isset($_POST['share_on_wa']) && $_POST['share_on_wa']) ? '1' : '0';
     $defunto_in_hero = (isset($_POST['defunto_in_hero']) && $_POST['defunto_in_hero']) ? '1' : '0';
+    $massimizza_foto = (isset($_POST['massimizza_foto']) && $_POST['massimizza_foto']) ? '1' : '0';
     $single_layout   = (isset($_POST['single_layout'])) ? $_POST['single_layout'] : '1';
 
     $impostazioni['tipo_visualizzazione'] = $tipo_vis;
@@ -186,6 +188,7 @@ if (isset($_POST['cambia_impostazioni'])) {
     $impostazioni['testo_hero']      = $testo_hero;
     $impostazioni['sfondo_hero']     = $sfondo_hero;
     $impostazioni['defunto_in_hero'] = $defunto_in_hero;
+    $impostazioni['massimizza_foto'] = $massimizza_foto;
     $impostazioni['eta_su_singolo']  = $eta_su_singolo;
 
     /*
@@ -468,6 +471,15 @@ if (isset($_POST['cambia_impostazioni'])) {
                     <p>Mostra nella Hero Section<input name="defunto_in_hero" type="checkbox" checked/></p>
                 <?php } else { ?>
                     <p>Mostra nella Hero Section<input name="defunto_in_hero" type="checkbox"/></p>
+                <?php } ?>
+            </div>
+
+            <div class="dgplugin-input-wrap">
+                <label>Massimizza foto</label>
+                <?php if ($massimizza_foto) {  ?>
+                    <p>Mostra foto principale grande <input name="massimizza_foto" type="checkbox" checked/></p>
+                <?php } else { ?>
+                    <p>Mostra foto principale grande <input name="massimizza_foto" type="checkbox"/></p>
                 <?php } ?>
             </div>
             
