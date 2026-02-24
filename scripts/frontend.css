@@ -91,9 +91,32 @@ a.necrologio-loop,
 	border-radius: 20px;
 	padding: 20px;
 }
+.lista-necrologi.slider {
+    align-items: center;
+}
+.lista-necrologi.slider .slick-list {
+    width: calc(100% - 100px);
+}
 .lista-necrologi.slider .necro-content,
 .lista-necrologi.necro-box-verticale .necro-content {
     flex-direction: column;
+}
+.lista-necrologi.slider button.slick-arrow {
+    all: unset;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+}
+
+.lista-necrologi.slider.slick-initialized .slick-slide {
+    padding: 10px;
+}
+.lista-necrologi.slider .slick-arrow svg {
+    fill: #667d90;
 }
 .lista-necrologi.necro-box-orrizzontale .necro-content {
     gap: 10px;

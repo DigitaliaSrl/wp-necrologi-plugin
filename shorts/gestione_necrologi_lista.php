@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) { exit; }
+
+if (!GestioneNecrologi::IsConfigurato()) {  echo 'lista'; return; }
+
 $impostazioni = GestioneNecrologi::GetImpostazioni();
 
 $tipo_vis     = (isset($impostazioni['tipo_visualizzazione'])) ? $impostazioni['tipo_visualizzazione'] :'grid';

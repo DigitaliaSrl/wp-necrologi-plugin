@@ -194,3 +194,113 @@ p.titolo-portale {
 .wp-admin .dgplugin-input-wrap p input[type=radio] {
    margin: 0;
 }
+
+/** PORTALEFUNEBRE CTA **/
+.welcome-panel-container {
+    box-sizing: border-box;
+    width: 100%;
+    clear: both;
+    display: block;
+    z-index: 1;
+    padding: 48px;
+    gap: 32px;
+    align-self: flex-end;
+    background: #fff;
+}
+.pf-banner-container {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
+    border-left: 5px solid #FD175B; /* Oro elegante */
+    border-radius: 8px;
+    color: #ffffff;
+    margin: 20px 20px 20px 0;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.pf-banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.pf-banner-text {
+    flex: 1;
+    min-width: 300px;
+}
+
+.pf-badge {
+    background: #d4373733;
+    color: #ff377c;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.pf-banner-text h2 {
+    color: #ffffff;
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.pf-banner-text p {
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    color: #e0e0e0;
+}
+
+.pf-banner-action {
+    flex-shrink: 0;
+}
+
+.pf-button {
+    background-color: #FD175B;
+    color: #fff;
+    text-decoration: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.pf-button:hover {
+    background-color: #eb3248;
+    transform: translateY(-2px);
+    color: #fff;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.pf-icon {
+    margin-left: 10px;
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.pf-button:hover .pf-icon {
+    transform: translateX(5px);
+}
+
+/* Responsive per schermi piccoli */
+@media (max-width: 782px) {
+    .pf-banner-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .pf-button {
+        width: 100%;
+        justify-content: center;
+    }
+}

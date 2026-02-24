@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Gestione Necrologi
+Plugin Name: Wp Necrologi Plugin
 Plugin URI: http://www.portalefunebre.com
 Description: Gestione dei necrologi sul tuo sito.
 Version: 1.0
@@ -12,10 +12,6 @@ License: GPL2
 if (!defined('ABSPATH')) { exit; }
 
 define('PORTALE_FUNEBRE_API_INCLUDED', true);
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 if (!PORTALE_FUNEBRE_API_INCLUDED) {
     
@@ -30,20 +26,24 @@ require_once('plugin_core/plugin_load.php');
 
 add_action( 'gestione_necrologi_head_left', function () {
     $link = PortaleFunebre_API::GetLoginPath();
-    echo '<p class="titolo-portale">Accedi al portale</p><a href="'.$link.'" target="__blank" class="button">Accedi ora</a>';
+    echo '<p class="titolo-portale">Accedi al portale</p><a href="'.esc_url_raw($link).'" target="__blank" class="button">Accedi ora</a>';
 
 });
 
 add_action('template_redirect', function () {
 
-    $url_string = (trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'));
+    if (isset($_SERVER['REQUEST_URI'])) {
 
-    $url_routes = explode('/',$url_string);
-    // Controlla se la route è "portalefunebre"
-    if (isset($url_routes[1]) &&  $url_routes[1] === 'portalefunebre') {
-        // Reindirizza alla URL desiderata
-        wp_redirect('https://www.portalefunebre.com/login');
-        exit;
+        $url_string = (trim(wp_parse_url(esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])), PHP_URL_PATH), '/'));
+
+        $url_routes = explode('/',$url_string);
+        // Controlla se la route è "portalefunebre"
+        if (isset($url_routes[1]) &&  $url_routes[1] === 'ofadmin') {
+            // Reindirizza alla URL desiderata
+            wp_redirect('https://www.portalefunebre.com/login');
+            exit;
+        }
+
     }
 
 }, 1);
@@ -61,18 +61,12 @@ class GestioneNecrologi extends Digitalia\PluginBase {
         $this->create_shortcode('gestione_necrologi_singolo');
         $this->create_shortcode('gestione_necrologi_slider');
 
-        /*
-        
-            'CLIENT_ID'  => 'eUQxZ0hUUEdOTUtHWE5wRksrYkU0QT09',
-            'API_KEY'    => '108409c1c3797f0570ee07d242f86c49a0a9be32',
-        */
-
         if (!isset(self::$IMPOSTAZIONI['api_key']) || !self::$IMPOSTAZIONI['api_key']|| !self::$IMPOSTAZIONI['client_id']) { return; }
         
         PortaleFunebre_API::Config([
-            'END_POINT'  => 'https://portalefunebre.com',
-            'CLIENT_ID'  => self::$IMPOSTAZIONI['client_id'],
-            'API_KEY'    => self::$IMPOSTAZIONI['api_key'],
+            'END_POINT' => 'https://portalefunebre.com',
+            'CLIENT_ID' => self::$IMPOSTAZIONI['client_id'],
+            'API_KEY'   => self::$IMPOSTAZIONI['api_key'],
         ]);
 
         self::$inInst = $this;
@@ -87,38 +81,46 @@ class GestioneNecrologi extends Digitalia\PluginBase {
             $vars[] = 'necro_slug';
             return $vars;
         });
-        add_action('template_redirect', function() use ($slug_singolo)  {
-            
-            $slug = get_query_var('necro_slug');
-            if (!$slug) { return; }
 
-            $post = get_page_by_path($slug_singolo, OBJECT, 'page'); // oppure 'post' se cerchi tra i post
-
-            if ($post) {
-                setup_postdata($post);
-                // imposta globali per far credere a WP che siamo su quella pagina
-                global $wp_query;
-                $wp_query->post    = $post;
-                $wp_query->posts   = [$post];
-                $wp_query->is_page = true;
-                $wp_query->is_singular = true;
-                $wp_query->is_home = false;
-                $wp_query->is_404 = false;
-
-                $template = get_single_template();
-
-                if (!$template) { $template = get_page_template(); }
-
-                if ($template) {
-                    include(get_single_template());
-                    exit;
-                }
+        if (GestioneNecrologi::IsConfigurato()) {
+            add_action('template_redirect', function() use ($slug_singolo)  {
                 
-            } else {
-                // fallback se non trova nulla
-                wp_die('Pagina non trovata', 'Errore 404', ['response' => 404]);
-            }
-        });
+                $slug = get_query_var('necro_slug');
+                
+                if (!$slug) { return; }
+
+                $post = get_page_by_path($slug_singolo, OBJECT, 'page'); // oppure 'post' se cerchi tra i post
+
+                if ($post) {
+                    
+                    setup_postdata($post);
+                    
+                    // imposta globali per far credere a WP che siamo su quella pagina
+                    global $wp_query;
+
+                    $wp_query->post    = $post;
+                    $wp_query->posts   = [$post];
+                    $wp_query->is_page = true;
+                    $wp_query->is_singular = true;
+                    $wp_query->is_home = false;
+                    $wp_query->is_404 = false;
+
+                    $template = get_single_template();
+
+                    if (!$template) { $template = get_page_template(); }
+
+                    if ($template) {
+                        include(get_single_template());
+                        exit;
+                    }
+                    
+                } else {
+                    // fallback se non trova nulla
+                    wp_die('Pagina non trovata', 'Errore 404', ['response' => 404]);
+                }
+            });
+        }
+            
 
     }
 
@@ -126,13 +128,24 @@ class GestioneNecrologi extends Digitalia\PluginBase {
         return self::$IMPOSTAZIONI;
     }
 
+    static function IsConfigurato() {
+        $set = self::GetImpostazioni();
+        if (!$set) { return false; }
+        if (!isset($set['api_key']) || !isset($set['client_id'])) { return false; } 
+        return $set['api_key'] && $set['client_id'];
+    }
+
     function create_menu_pages() {
 
-        return [
-            'Necrologi',
-            'Cordogli',
-            'Impostazioni'
-        ];
+        if (self::IsConfigurato()) {
+            return [
+                'Necrologi',
+                'Cordogli',
+                'Impostazioni'
+            ];
+        }
+
+        return ['Impostazioni'];
 
     }
 

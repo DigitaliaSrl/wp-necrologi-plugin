@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('ABSPATH')) { exit; }
+
 if (!defined('PORTALE_FUNEBRE_API_INCLUDED')) {
     die('');
 }
@@ -94,35 +96,23 @@ class PortaleFunebre_API {
         
         try {
 
-            $postdata = http_build_query($data);
-            // Inizializza cURL
-            $ch = curl_init($url);
+            $response = wp_remote_post($url, [
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ],
+                'body'        => $data,
+                'timeout'     => 660,
+                'data_format' => 'body',
+            ]);
 
-            // Configura cURL
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Content-Type: application/x-www-form-urlencoded'
-            ));
-
-            // Esegui la richiesta e cattura la risposta
-            $result = curl_exec($ch);
-
-            // Controllo del risultato
-            if ($result === FALSE) {
-                // Gestione dell'errore
-
-                throw new Exception("Api call not valid");
-
+            if (is_wp_error($response)) {
+                throw new Exception('Api call not valid');
             }
 
-            return $result;
+            return wp_remote_retrieve_body($response);
 
         } catch (Exception $e) {
-            // Stampa il risultato
-            return[ 'error' => $e->GetMessage() ];
-
+            return ['error' => $e->getMessage()];
         }
         
     }

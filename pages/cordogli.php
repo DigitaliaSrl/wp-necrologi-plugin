@@ -2,6 +2,8 @@
 
 use function Digitalia\get_plugin_page_url;
 
+if (!defined('ABSPATH')) { exit; }
+
 $api = new PortaleFunebre_API();
 
 $cordogli_url = get_plugin_page_url('cordogli').'&defunto=';

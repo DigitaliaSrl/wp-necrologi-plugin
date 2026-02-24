@@ -2,6 +2,8 @@
 
 use function Digitalia\get_plugin_asset_url as get_asset_url;
 
+if (!defined('ABSPATH')) { exit; }
+
 $impostazioni = GestioneNecrologi::GetImpostazioni();
 
 

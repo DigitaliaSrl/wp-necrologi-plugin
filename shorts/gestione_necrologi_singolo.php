@@ -1,8 +1,8 @@
 <?php
 
-if (!isset($_GET['of'])) {
-  //wp_redirect(get_site_url().'/not-found');
-}
+if (!defined('ABSPATH')) { exit; }
+
+if (!GestioneNecrologi::IsConfigurato()) {  echo 'necrologio'; return; }
 
 $impostazioni = GestioneNecrologi::GetImpostazioni();
 

@@ -1,38 +1,38 @@
-=== Gestione Necrologi ===
+=== Wp Necrologi Plugin ===
 Contributors: arseni filipov, jacopo zane
 Tags: custom, plugin, cms funebre, necrologi, cms
-Requires at least: 5.0
-Tested up to: 6.0
-Requires PHP: 7.0
+Requires at least: 6.0
+Tested up to: 7.0
+Requires PHP: 7.4
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-Gestisce i necrologi del portale funebre direttamente sul tuo sito.. 
+Handles your PortaleFunebre Obituaries directly from your website.. 
 
 == Installation ==
 
-1. Carica i file del plugin nella directory `/wp-content/plugins/mio-plugin`, o installa il plugin direttamente attraverso la schermata dei plugin di WordPress.
-2. Attiva il plugin attraverso la schermata 'Plugin' in WordPress.
-3. Utilizza il plugin dal menù di amministrazione di WordPress.
+1. Upload the plugin directly, or install it from the WordPress plugin's page.
+2. Activate the plugin within the 'Plugin' page in WordPress.
+3. Use the plugin by the menu in the WordPress backend admin.
 
 == Frequently Asked Questions ==
 
-= Domanda 1? =
+= How Does Wp Necrologi Plugin Work? =
 
-Risposta 1.
+It offers an API Interface for linking PortaleFunebre directly to your website.
 
-= Chi posso contattare per supporto? =
+= Where can i get in touch to receive support? =
 
-Per supporto, contattaci su [support@portalefunebre.com](mailto:support@portalefunebre.com).
+To receive support, contact us at [support@portalefunebre.com](mailto:support@portalefunebre.com).
 
 == Changelog ==
 
 = 1.0 =
-* Prima versione del plugin.
-* Integrazione API
-* Visualizzazione statistiche
-* Visualizzazione necrologi singolo e lista
-* Impostazioni di Visualizzazione aggiunte
+* First plugin version.
+* PortaleFunebre API integration
+* Stats displaying
+* Single and List Obits display
+* Add various display settings

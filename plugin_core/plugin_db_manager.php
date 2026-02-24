@@ -71,8 +71,7 @@ class DbOpzioniPlugin {
     // Metodo per leggere un'entry dalla tabella per nome
     public function get_entry($nome) {
         global $wpdb;
-        $query = $wpdb->prepare("SELECT * FROM $this->table_name WHERE nome = %s", $nome);
-        return $wpdb->get_row($query, ARRAY_A);
+        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $this->table_name WHERE nome = %s", $nome), ARRAY_A);
     }
 
     // Metodo per aggiornare un'entry nella tabella per nome
