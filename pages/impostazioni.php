@@ -110,7 +110,7 @@ $massimizza_foto = (isset($impostazioni['massimizza_foto'])) ? boolval($impostaz
 if (isset($_POST['cambia_impostazioni'])) {
 
     if (!current_user_can('manage_options')) {
-        wp_die(esc_html__('Non hai i permessi per modificare queste impostazioni.', 'gestione_necrologi'));
+        wp_die(esc_html__('Non hai i permessi per modificare queste impostazioni.', 'portale-funebre-necrologi'));
     }
 
     check_admin_referer('gestione_necrologi_save_settings', 'gestione_necrologi_nonce');
