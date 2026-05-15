@@ -47,7 +47,8 @@ abstract class AdminMenuManager {
     static function IncludiPaginaPlugin($file, $nomePlugin, $nomePagina) {
 
         echo '<div class="wrap digitalia-wp-plugin"><div class="testata-plugin"><div class="left">';
-        echo '<h1>'.PluginBase::get_plugin_name().': '.$nomePagina.'</h1><p style="margin-top: 0px;">v'.PluginBase::get_version().' di <i>'.PluginBase::get_author().'</i></p></div>';
+        echo '<h1>' . esc_html(PluginBase::get_plugin_name()) . ': ' . esc_html($nomePagina) . '</h1>
+        <p style="margin-top: 0px;">v' . esc_html(PluginBase::get_version()) . ' di <i>' . wp_kses_post(PluginBase::get_author()) . '</i></p></div>';
         echo '<div class="right">';
         do_action('gestione_necrologi_head_left');
         echo '</div></div><hr>';

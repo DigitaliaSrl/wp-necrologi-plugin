@@ -24,6 +24,10 @@ if (!PORTALE_FUNEBRE_API_INCLUDED) {
 
 require_once('plugin_core/plugin_load.php');
 
+if (!class_exists('PortaleFunebre_API')) {
+    require_once plugin_dir_path(__FILE__) . 'inc/funebreapi/PortaleFunebre_API.php';
+}
+
 add_action( 'gestione_necrologi_head_left', function () {
     $link = PortaleFunebre_API::GetLoginPath();
     echo '<p class="titolo-portale">Accedi al portale</p><a href="'.esc_url_raw($link).'" target="__blank" class="button">Accedi ora</a>';
@@ -40,7 +44,7 @@ add_action('template_redirect', function () {
         // Controlla se la route è "portalefunebre"
         if (isset($url_routes[1]) &&  $url_routes[1] === 'ofadmin') {
             // Reindirizza alla URL desiderata
-            wp_redirect('https://www.portalefunebre.com/login');
+            wp_safe_redirect('https://www.portalefunebre.com/login');
             exit;
         }
 
@@ -130,7 +134,9 @@ class GestioneNecrologi extends Digitalia\PluginBase {
                 $slug = get_query_var('pf_share_slug');
                 if (!$slug) return;
 
-                $api = new PortaleFunebre_API();
+                remove_all_actions('wpseo_head');
+
+                $api  = new PortaleFunebre_API();
                 $data = $api->TrovaNecrologioSingolo($slug);
 
                 if (!$data || (empty($data))) {
@@ -141,46 +147,60 @@ class GestioneNecrologi extends Digitalia\PluginBase {
 
                 $thumb = $data->thumbnail;
                 $title = esc_attr($data->nome_defunto).' - '.$agenzia->ragione_sociale;
-                $desc  = wp_strip_all_tags(esc_attr($data->testo));
-                $img   = PortaleFunebre_API::GetImgUrl('').'/'.$thumb;
+                $desc  = wp_strip_all_tags($data->testo);
+                $img   = PortaleFunebre_API::GetImgUrl('').$thumb;
 
                 if (!$desc) {
                     $desc = 'E\' mancato/a all\'affetto dei suoi cari '.$data->nome_defunto;
                 }
-                
+                $url      = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                 $real_url = esc_url(home_url('/'.self::$IMPOSTAZIONI['slug_singolo'].'/'.$slug));
 
+                if (isset($_GET['dev-test'])) {
+
+                    echo $desc;
+                    echo '<img src="'.esc_url($img).'"/>';
+                    die();
+                }
+                /*
+                        <meta http-equiv="refresh" content="0;url=<?php echo $real_url; ?>">
+                */
                 ?>
                 <!DOCTYPE html>
                 <html>
                     <head>
 
-                        <title><?php echo $title; ?></title>
+                        <title><?php echo esc_attr($title); ?></title>
 
                         <!-- Open Graph / Facebook -->
-                        <meta property="og:title" content="<?php echo $title; ?>" />
-                        <meta property="og:title" content="<?php echo $title; ?>" />
-                        <meta property="og:description" content="<?php echo $desc; ?>" />
-                        <meta property="og:image" content="<?php echo $img; ?>" />
-                        <meta property="og:type" content="article" />
+                        <meta property="og:title" content="<?php echo esc_attr($title); ?>" />
+                        <meta property="og:description" content="<?php echo esc_attr($desc); ?>" />
+                        <meta property="og:image" content="<?php echo esc_url($img); ?>" />
+                        <meta property="og:image:secure_url" content="<?php echo esc_url($img); ?>" />
+                        <meta property="og:image:width" content="640" />
+                        <meta property="og:image:height" content="780" />
+                        <meta property="og:type"  content="article" />
+                        <meta property="og:url" content="<?php echo esc_url($url); ?>" />
 
                         <!-- X (Twitter) -->
-                        <meta property="twitter:card" content="<?php echo $title; ?>" />
+                        <meta property="twitter:card" content="<?php echo esc_attr($title); ?>" />
                         <meta property="twitter:url" content="<?php echo $real_url; ?>" />
-                        <meta property="twitter:title" content="<?php echo $title; ?>" />
-                        <meta property="twitter:description" content="<?php echo $desc; ?>" />
-                        <meta property="twitter:image" content="<?php echo $img; ?>" />
+                        <meta property="twitter:title" content="<?php echo esc_attr($title); ?>" />
+                        <meta property="twitter:description" content="<?php echo esc_attr($desc); ?>" />
+                        <meta property="twitter:image" content="<?php echo esc_url($img); ?>" />
 
-                        <meta name="msapplication-TileImage" content="<?php echo $img; ?>">
+                        <meta name="msapplication-TileImage" content="<?php echo esc_url($img); ?>">
                         <meta name="robots" content="noindex, nofollow">
 
-                        <meta http-equiv="refresh" content="0;url=<?php echo $real_url; ?>">
 
                     </head>
-                    <body>
-                        <h1><?php echo $title; ?></h1>
-                        <p><?php echo $desc; ?></p>
-                        <img src="<?php echo $img; ?>"/>
+                    <body style="opacity: 0">
+                        <h1><?php echo esc_attr($title); ?></h1>
+                        <p><?php echo esc_attr($desc); ?></p>
+                        <img src="<?php echo esc_url($img); ?>"/>
+                        <script>
+                            window.location.href = "<?php echo $real_url; ?>";
+                        </script>
                     </body>
                 </html>
                 <?php

@@ -12,7 +12,7 @@ if (!function_exists('digitalia_plugin_loader')) {
         require_once('admin_menu_manager.php');
         require_once('plugin_render.php');
 
-        if (PORTALE_FUNEBRE_API_INCLUDED) {
+        if (defined('PORTALE_FUNEBRE_API_INCLUDED') && PORTALE_FUNEBRE_API_INCLUDED) {
             require_once(plugin_dir_path(__FILE__).'../inc/funebreapi/PortaleFunebre_API.php');
         }
 

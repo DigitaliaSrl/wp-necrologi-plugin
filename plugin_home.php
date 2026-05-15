@@ -25,10 +25,10 @@ $impostazioni    = get_plugin_page_url('impostazioni');
         <div class="welcome-panel-header">
 
             <div class="welcome-panel-header-image">
-                <img src="<?php echo $img_url; ?>"/>
+                <img src="<?php echo esc_url($img_url); ?>"/>
             </div>
-            <h2><?php echo Digitalia\PluginBase::get_plugin_name(); ?></h2>
-            <p><?php echo Digitalia\PluginBase::get_description(); ?></p>
+            <h2><?php echo esc_html(Digitalia\PluginBase::get_plugin_name()); ?></h2>
+            <p><?php echo esc_html(Digitalia\PluginBase::get_description()); ?></p>
         </div>
         <?php  if (!GestioneNecrologi::IsConfigurato()) { ?>
             <div class="welcome-panel-container">
@@ -58,8 +58,8 @@ $impostazioni    = get_plugin_page_url('impostazioni');
                     <div class="welcome-panel-column-content">
                         <h3>Crea e gestisci i tuoi necrologi</h3>
                         <p>Per creare, modificare e eliminare i necrologi, accedi al portale amministrativo. i tuoi necrologi saranno subito visibili all'interno del tuo sito</p>
-                        <h4>(hai inserito <?php echo $stats->numero_necrologi; ?> necrologi)</h4>
-                        <a href="<?php echo $lista_necrologi; ?>">Visulizzali adesso</a>
+                        <h4>(hai inserito <?php echo esc_html($stats->numero_necrologi); ?> necrologi)</h4>
+                        <a href="<?php echo esc_url($lista_necrologi); ?>">Visulizzali adesso</a>
                     </div>
                 </div>
 
@@ -68,8 +68,8 @@ $impostazioni    = get_plugin_page_url('impostazioni');
                     <div class="welcome-panel-column-content">
                         <h3>Visualizza i necrologi sul tuo sito, e raccogli i cordogli</h3>
                         <p>Il nostro portale funebre si integra direttamente al tuo sito, grazie a questo apposito plugin potrai visualizzarli e iniziare subito a raccogliere i cordogli</p>  
-                        <h4>(hai ricevuto <?php echo $stats->numero_cordogli; ?> cordogli)</h4>
-                        <a href="<?php echo $lista_cordogli; ?>">Mostra i cordogli</a>
+                        <h4>(hai ricevuto <?php echo esc_html($stats->numero_cordogli); ?> cordogli)</h4>
+                        <a href="<?php echo esc_url($lista_cordogli); ?>">Mostra i cordogli</a>
                     </div>
                 </div>
 
@@ -78,7 +78,7 @@ $impostazioni    = get_plugin_page_url('impostazioni');
                     <div class="welcome-panel-column-content">
                         <h3>Cambia l'aspetto e gli stili di visualizzazione</h3>
                         <p>Grazie a questo plugin potrai modificare il modo di visualizzare i necrologi e cambiare alcuni aspetti visivi</p>
-                        <a href="<?php echo $impostazioni; ?>">Modifica impostazioni</a>
+                        <a href="<?php echo esc_url($impostazioni); ?>">Modifica impostazioni</a>
                     </div>
                 </div>
 

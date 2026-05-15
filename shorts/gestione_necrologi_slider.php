@@ -44,7 +44,7 @@ $arrowRight = '<svg xmlns="http://www.w3.org/2000/svg" width="25px" xmlns:xlink=
         $looper = $('.lista-necrologi');
 
         DgNecrologi.slugs = {
-            slug_singolo: "<?php echo $slug_singolo; ?>"
+            slug_singolo: <?php echo wp_json_encode($slug_singolo); ?>
         };
     
         DgPlugin.ajax('get_anteprima_necrologi',function (cerimonie) {
@@ -68,26 +68,26 @@ $arrowRight = '<svg xmlns="http://www.w3.org/2000/svg" width="25px" xmlns:xlink=
                     infinite: true,
                     speed: 300,
                     slidesToShow: <?php echo intval(ceil($slide_res_desktop * 1.14)); ?>,
-                    prevArrow: `<button class="slick-prev" aria-label="Previous"><?php echo $arrowLeft; ?></button>`,
-                    nextArrow: `<button class="slick-next" aria-label="Next"><?php echo $arrowRight; ?></button>`,
+                    prevArrow: <?php echo wp_json_encode('<button class="slick-prev" aria-label="Previous">' . $arrowLeft . '</button>'); ?>,
+                    nextArrow: <?php echo wp_json_encode('<button class="slick-next" aria-label="Next">' . $arrowRight . '</button>'); ?>,
                     slidesToScroll: 1,
                     responsive: [
                         {
                             breakpoint: 1980,
                             settings: {
-                                slidesToShow: <?php echo $slide_res_desktop; ?>,
+                                slidesToShow: <?php echo absint($slide_res_desktop); ?>,
                             }
                         },
                         {
                             breakpoint: 1280,
                             settings: {
-                                slidesToShow: <?php echo $slide_res_tablet; ?>,
+                                slidesToShow: <?php echo absint($slide_res_tablet); ?>,
                             }
                         },
                         {
                             breakpoint: 768,
                             settings: {
-                                slidesToShow: <?php echo $slide_res_mobile; ?>,
+                                slidesToShow: <?php echo absint($slide_res_mobile); ?>,
                             }
                         },
                         {

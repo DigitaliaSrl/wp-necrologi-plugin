@@ -8,13 +8,13 @@ $api = new PortaleFunebre_API();
 
 $cordogli_url = get_plugin_page_url('cordogli').'&defunto=';
 
-$defunto_slug = (isset($_GET['defunto'])) ? $_GET['defunto'] : '';
+$defunto_slug = (isset($_GET['defunto'])) ? sanitize_text_field(wp_unslash($_GET['defunto'])) : '';
 
 if ($defunto_slug) {
     
     $necrologio = $api->TrovaNecrologioSingolo($defunto_slug, true);
 
-    echo '<h1>CORDOGLI PER: '.$necrologio->nome_defunto.'</h1><hr>';
+    echo '<h1>CORDOGLI PER: ' . esc_html($necrologio->nome_defunto) . '</h1><hr>';
 
     $cordogli = $necrologio->cordogli;
 
@@ -28,7 +28,7 @@ if ($defunto_slug) {
 
         $num_cordogli = count($dati);
 
-        echo '<h2>'.strtoupper($tipo_cordoglio).' ('.$num_cordogli.')</h2>';
+        echo '<h2>' . esc_html(strtoupper($tipo_cordoglio)) . ' (' . esc_html($num_cordogli) . ')</h2>';
 
         if ($num_cordogli < 1) { echo '-- nessun corodglio ricevuto al momento'; }
 
@@ -48,7 +48,7 @@ if ($defunto_slug) {
                 $mex          = $cord->messaggio;
 
 
-                echo '<tr><td><b>'.$nome_cognome.'</b></td><td><b>'.$mail.'</b></td><td>'.$telefono.'</td><!--td>'.$telefono.'</td--><td>'.$mex.'</td></tr>';
+                echo '<tr><td><b>' . esc_html($nome_cognome) . '</b></td><td><b>' . esc_html($mail) . '</b></td><td>' . esc_html($telefono) . '</td><!--td>' . esc_html($telefono) . '</td--><td>' . esc_html($mex) . '</td></tr>';
 
 
             }
@@ -83,13 +83,13 @@ if ($defunto_slug) {
 
                     if ($totali < 1) { continue; }
 
-                    $azioni = '<a href="'.$cordogli_url.$cer->slug.'">vedi</a>';
+                    $azioni = '<a href="' . esc_url($cordogli_url . $cer->slug) . '">vedi</a>';
 
                     $thumb = PortaleFunebre_API::GetImgUrl($cer->thumbnail);
 
-                    $img = '<img src="'.$thumb.'" style="width: 40px"/>';
+                    $img = '<img src="' . esc_url($thumb) . '" style="width: 40px"/>';
 
-                    echo '<tr><td>'.$img.'</td><td><b>'.$cer->nome_defunto.'</b> ('.$totali.' cordogli totali)</td><td>'.$num_email.'</td><!--td>'.$num_whatsapp.'</td--><td>'.$num_pdf.'</td><td>'.$azioni.'</td></tr>';
+                    echo '<tr><td>' . wp_kses_post($img) . '</td><td><b>' . esc_html($cer->nome_defunto) . '</b> (' . esc_html($totali) . ' cordogli totali)</td><td>' . esc_html($num_email) . '</td><!--td>' . esc_html($num_whatsapp) . '</td--><td>' . esc_html($num_pdf) . '</td><td>' . wp_kses_post($azioni) . '</td></tr>';
 
 
                 }

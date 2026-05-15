@@ -29,7 +29,7 @@ function get_plugin_asset_url($name) {
 }
 
 function dg_ajax_plugin_base() {
-    
+
     $azione = sanitize_text_field($_POST['dgplugin_action']);
 
     if (isset(PluginBase::$ACTIONS[$azione])) {
@@ -38,7 +38,7 @@ function dg_ajax_plugin_base() {
         wp_send_json_success($res);
 
     }
-    
+
 }
 add_action('wp_ajax_dg_ajax_plugin_base', __NAMESPACE__ . '\\dg_ajax_plugin_base');
 add_action('wp_ajax_nopriv_dg_ajax_plugin_base', __NAMESPACE__ . '\\dg_ajax_plugin_base');
@@ -80,19 +80,19 @@ class PluginBase {
 
         $main_class = $this;
         register_activation_hook($main_plugin_file, function () {
-            
+
             if (!$this->is_installed()) {
                 $this->dbMan->create_table_if_not_exists();
                 $this->before_install();
             }
             $this->before_activation();
-            
+
         });
-        
+
         //register_uninstall_hook(__FILE__, [$this,'after_uninstall']);
 
         $plug_fold_name = basename($this->plug_dir);
-        
+
         if ( is_admin() ) {
 
             add_action('admin_enqueue_scripts', function () {
@@ -122,9 +122,9 @@ class PluginBase {
                     }
 
                 }
-                
+
             });
-            
+
             add_action('admin_enqueue_scripts', function ($hook) use ($plug_fold_name) {
                 // Carica solo per le pagine del plugin
                 if (strpos($hook, $this->slug) !== false) {
@@ -132,7 +132,7 @@ class PluginBase {
                     wp_enqueue_script($this->slug.'-backend', plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/backend.js', array('jquery'), null, true);
                 }
             });
-        
+
         }
 
         add_action('wp_enqueue_scripts', function () use ($plug_fold_name) {
@@ -149,8 +149,8 @@ class PluginBase {
                         let plug_vars = <?php echo json_encode(self::$GLOBAL_OBJ_VARS); ?>;
 
                         /*this.img_url  = '< ?php echo self::GetImgUrl(''); ? >';*/
-                        this.site_url = '<?php echo get_site_url(); ?>';
-                        let ajax_url  = '<?php echo admin_url('admin-ajax.php'); ?>';
+                        this.site_url = <?php echo wp_json_encode(get_site_url()); ?>;
+                        let ajax_url  = <?php echo wp_json_encode(admin_url('admin-ajax.php')); ?>;
 
                         this.get_var = function (vname) { return plug_vars[vname]; }
 
@@ -162,7 +162,7 @@ class PluginBase {
                                 action: 'dg_ajax_plugin_base',
                                 dgplugin_action: action_required
                             };
-                            
+
                             if (data_c) { for (let i in data_c) { dati_call[i] = data_c[i]; } }
 
                             $.ajax({
@@ -180,7 +180,7 @@ class PluginBase {
                 })(jQuery);
             </script>
         <?php });
-        
+
     }
 
     private function hasCall($call_name) {
@@ -189,7 +189,7 @@ class PluginBase {
     }
 
     protected function is_installed() { return $this->dbMan->isPluginInstalled(); }
-    
+
     public function get_opzione(string $opzione) {
 
         $db  = $this->dbMan;
@@ -211,8 +211,8 @@ class PluginBase {
     static function add_css_variables($variabili) {
         \add_action( 'wp_head', function () use ($variabili) {
             $custom_css = '';
-            foreach ($variabili as $k => $val) { $custom_css .= "--dg-$k: $val;\n"; }            
-            echo "<style>:root {\n$custom_css\n}</style>";
+            foreach ($variabili as $k => $val) { $custom_css .= "--dg-$k: $val;\n"; }
+            echo '<style>:root {' . "\n" . esc_html($custom_css) . "\n" . '</style>';
         } );
     }
 
@@ -236,13 +236,13 @@ class PluginBase {
 
             self::$INST = $this;
             self::$CURRENT_ACTIVE_PLUGIN = basename($this->plug_dir);
-            
+
             self::$PLUGDATA = \get_plugin_data($this->plug_dir.'/index.php');
 
             AdminMenuManager::IncludiPaginaPlugin($this->plug_dir.'/plugin_home.php',$this->plugin_name,'Overview');
-            
+
         } else if (isset($this->PAGINE[$page_found])) {
-            
+
             self::$INST = $this;
             self::$CURRENT_ACTIVE_PLUGIN = basename($this->plug_dir);
 
@@ -269,11 +269,11 @@ class PluginBase {
         add_shortcode($short_string, function($atts) use ($short_string, $shorts_folder) {
 
             $shortcode_file = $shorts_folder . $short_string . '.php';
-    
+
             if (file_exists($shortcode_file)) {
-                
+
                 if (function_exists($short_string)) {
-                    return call_user_func($short_string, shortcode_atts(array(), $atts));
+                    return call_user_func($short_string, shortcode_atts([], $atts));
                 } else {
                     ob_start();
                     include_once($shortcode_file);

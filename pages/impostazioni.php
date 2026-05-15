@@ -231,7 +231,7 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Desktop: numero di slide</label>
                 <select name="slide_res_desktop">
                     <?php foreach ($valori_slide_res as $key => $value) { ?>
-                        <option <?php if ($key == $slide_res_desktop) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $slide_res_desktop) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -239,7 +239,7 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Tablet: numero di slide</label>
                 <select name="slide_res_tablet">
                     <?php foreach ($valori_slide_res as $key => $value) { ?>
-                        <option <?php if ($key == $slide_res_tablet) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $slide_res_tablet) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -247,7 +247,7 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Mobile: numero di slide</label>
                 <select name="slide_res_mobile">
                     <?php foreach ($valori_slide_res as $key => $value) { ?>
-                        <option <?php if ($key == $slide_res_mobile) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $slide_res_mobile) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -257,7 +257,7 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Funerale: mostra</label>
                 <select name="slide_cerimonia">
                     <?php foreach ($valori_cerimonia as $key => $value) { ?>
-                        <option <?php if ($key == $slide_cerimonia) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $slide_cerimonia) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -265,7 +265,7 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Rosario: mostra </label>
                 <select name="slide_rosario">
                     <?php foreach ($valori_rosario as $key => $value) { ?>
-                        <option <?php if ($key == $slide_rosario) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $slide_rosario) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -318,7 +318,7 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Tipo di Visualizzazione</label>
                 <select name="tipo_vis">
                     <?php foreach ($tipi_visualizzazione as $key => $value) { ?>
-                        <option <?php if ($key == $tipo_vis) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $tipo_vis) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -340,24 +340,24 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Profilo del box</label>
                 <select name="profilo_box">
                     <?php foreach ($profili as $key => $value) { ?>
-                        <option <?php if ($key == $profilo_box) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $profilo_box) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
             <div class="dgplugin-input-wrap">
                 <label>Colore del Box</label>
-                <input name="colore_box" type="color" value="<?php echo $colore_box; ?>"/>
+                <input name="colore_box" type="color" value="<?php echo esc_attr($colore_box); ?>"/>
             </div>
             <div class="dgplugin-input-wrap">
                 <label>Colore Testo</label>
-                <input name="colore_testo" type="color" value="<?php echo $colore_testo; ?>"/>
+                <input name="colore_testo" type="color" value="<?php echo esc_attr($colore_testo); ?>"/>
             </div>
             <h3>Dati della cerimonia</h3>
             <div class="dgplugin-input-wrap box-prof-wrap">
                 <label>Funerale: mostra</label>
                 <select name="cerimonia">
                     <?php foreach ($valori_cerimonia as $key => $value) { ?>
-                        <option <?php if ($key == $cerimonia) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $cerimonia) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -365,7 +365,7 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Rosario: mostra </label>
                 <select name="rosario">
                     <?php foreach ($valori_rosario as $key => $value) { ?>
-                        <option <?php if ($key == $rosario) { echo 'selected'; } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+                        <option <?php if ($key == $rosario) { echo 'selected'; } ?> value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
                     <?php } ?>
                 </select>
             </div>
@@ -432,14 +432,14 @@ if (isset($_POST['cambia_impostazioni'])) {
                 <label>Layout del necrologio</label>
                 <p>
                     <?php if ($single_layout == 1) { ?>
-                        <span><img src="<?php echo $laytwo_img; ?>"/><input type="radio" name="single_layout" value="1" checked/></span>
+                        <span><img src="<?php echo esc_url($laytwo_img); ?>"/><input type="radio" name="single_layout" value="1" checked/></span>
                     <?php } else { ?>
-                        <span><img src="<?php echo $laytwo_img; ?>"/><input type="radio" name="single_layout" value="1"/></span>
+                        <span><img src="<?php echo esc_url($laytwo_img); ?>"/><input type="radio" name="single_layout" value="1"/></span>
                     <?php } ?>
                     <?php if ($single_layout == 2) { ?>
-                        <span><img src="<?php echo $layone_img; ?>"/><input type="radio" name="single_layout" value="2" checked/></span>
+                        <span><img src="<?php echo esc_url($layone_img); ?>"/><input type="radio" name="single_layout" value="2" checked/></span>
                     <?php } else { ?>
-                        <span><img src="<?php echo $layone_img; ?>"/><input type="radio" name="single_layout" value="2"/></span>
+                        <span><img src="<?php echo esc_url($layone_img); ?>"/><input type="radio" name="single_layout" value="2"/></span>
                     <?php } ?>
                 </p>
             </div>
@@ -511,7 +511,7 @@ if (isset($_POST['cambia_impostazioni'])) {
             </div>
             <div class="dgplugin-input-wrap">
                 <label>Colore della pagina</label>
-                <input name="colore_page" type="color" value="<?php echo $colore_page; ?>"/>
+                <input name="colore_page" type="color" value="<?php echo esc_attr($colore_page); ?>"/>
             </div>
 
             <div class="dgplugin-input-wrap">
@@ -546,21 +546,21 @@ if (isset($_POST['cambia_impostazioni'])) {
             <h3>G.D.P.R.</h3>
             <div class="dgplugin-input-wrap">
                 <label>Link della Privacy Policy</label>
-                <input name="link_gdpr" type="text" value="<?php echo $link_gdpr; ?>"/>
+                <input name="link_gdpr" type="text" value="<?php echo esc_url($link_gdpr); ?>"/>
             </div>
 
             <h3>Integrazione API</h3>
             <div class="dgplugin-input-wrap">
                 <label>Api Key</label>
-                <input name="api_key" type="text" value="<?php echo $api_key; ?>"/>
+                <input name="api_key" type="text" value="<?php echo esc_attr($api_key); ?>"/>
             </div>
             <div class="dgplugin-input-wrap">
                 <label>Client ID</label>
-                <input name="client_id" type="text" value="<?php echo $client_id; ?>"/>
+                <input name="client_id" type="text" value="<?php echo esc_attr($client_id); ?>"/>
             </div>
             <div class="dgplugin-input-wrap">
                 <label>Slug della pagina necrologi</label>
-                <input name="slug_singolo" type="text" value="<?php echo $slug_singolo; ?>"/>
+                <input name="slug_singolo" type="text" value="<?php echo esc_attr($slug_singolo); ?>"/>
             </div>
             
 
@@ -612,7 +612,7 @@ if (isset($_POST['cambia_impostazioni'])) {
         });
 
 
-        let opened_tab = '<?php if (isset($_GET['tab'])) { echo $_GET['tab']; } ?>';
+        let opened_tab = '<?php if (isset($_GET['tab'])) { echo esc_js(sanitize_key(wp_unslash($_GET['tab']))); } ?>';
 
         if (opened_tab) {
             $('.impostazioni-header a[to="'+opened_tab+'"]').trigger('click');

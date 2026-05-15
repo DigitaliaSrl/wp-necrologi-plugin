@@ -19,7 +19,7 @@ array_push($list_classes, ($profilo_box == 'verticale') ? 'necro-box-verticale' 
 <div class="necrologi-loader"><div class="dg_spinner"></div></div>
 
 <?php ?>
-<div class="lista-necrologi <?php echo implode(' ',$list_classes) ?>"></div>
+<div class="lista-necrologi <?php echo esc_attr(implode(' ', $list_classes)); ?>"></div>
 <script>
 
   jQuery(document).ready(function ($) {
@@ -28,7 +28,7 @@ array_push($list_classes, ($profilo_box == 'verticale') ? 'necro-box-verticale' 
     $looper = $('.lista-necrologi');
 
     DgNecrologi.slugs = {
-      slug_singolo: "<?php echo $slug_singolo; ?>"
+      slug_singolo: <?php echo wp_json_encode($slug_singolo); ?>
     };
     
     DgPlugin.ajax('get_lista_necrologi',function (cerimonie) {

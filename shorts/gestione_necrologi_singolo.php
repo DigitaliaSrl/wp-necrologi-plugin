@@ -60,19 +60,19 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
 
 <div class="necrologi-loader"><div class="dg_spinner"></div></div>
 
-<div class="post-necrologio portale-funebre-post <?php echo $classes; ?>" style="display: none">
+<div class="post-necrologio portale-funebre-post <?php echo esc_attr($classes); ?>" style="display: none">
 
 
   <?php if ($titolo_hero || $testo_hero): ?>
       <div class="necro-hero-section" style="background-image: url('<?php echo esc_url($bg_url); ?>')">
           <div class="necrohero-inner">
-            <?php if ($titolo_hero): ?><h1><?php echo $titolo_hero; ?></h1><?php endif; ?>
-            <?php if ($testo_hero): ?><p><?php echo $testo_hero; ?></p><?php endif; ?>
+            <?php if ($titolo_hero): ?><h1><?php echo esc_html($titolo_hero); ?></h1><?php endif; ?>
+            <?php if ($testo_hero): ?><p><?php echo esc_html($testo_hero); ?></p><?php endif; ?>
           </div>
       </div>
   <?php endif; ?>
 
-  <div class="necrologio-wrapper <?php echo $tipo_layout; ?>">
+  <div class="necrologio-wrapper <?php echo esc_attr($tipo_layout); ?>">
     
     <div class="necro-content">
       
@@ -242,7 +242,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
           </div>
           <?php if ($pvcy_link) { ?>
             <div class="form-group pvcy-group full">
-                <p><input type="checkbox" name="privacy" required/><label for="privacy">Ho letto e accetto la <a target="_blank" href="<?php echo $pvcy_link; ?>">privacy policy</a>*</label></p>
+                <p><input type="checkbox" name="privacy" required/><label for="privacy">Ho letto e accetto la <a target="_blank" href="<?php echo esc_url($pvcy_link); ?>">privacy policy</a>*</label></p>
             </div>
           <?php } ?>
           <div class="convalidazione"></div>
@@ -278,7 +278,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
 
 
       if (!cerimonia) {
-        window.location = "<?php echo get_site_url().'/not-found'; ?>";
+        window.location = <?php echo wp_json_encode(get_site_url().'/not-found'); ?>;
       }
 
       let agenzia = 'Onoranze Funebri';
@@ -356,7 +356,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
       
       $('.portale-funebre-post.post-necrologio').fadeIn();
 
-      const shareUrl = "<?php echo get_site_url(); ?>/pf-share/<?php echo $slug_necrologio; ?>";
+      const shareUrl = <?php echo wp_json_encode(get_site_url() . '/pf-share/' . $slug_necrologio); ?>;
 
       if (cerimonia.lista_links && cerimonia.lista_links.length > 0) {
           let $cusLinkSec = $('div.custom-links');
@@ -374,7 +374,7 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
       })
 
         
-    },{ slug: "<?php echo $slug_necrologio; ?>" });
+    },{ slug: <?php echo wp_json_encode($slug_necrologio); ?> });
 
   });
 

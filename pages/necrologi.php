@@ -24,23 +24,23 @@ $cordogli_url = get_plugin_page_url('cordogli').'&defunto=';
                 $feretro  = $cer->chiusura_feretro;
                 $rosario  = $cer->rosario;
 
-                $dati_funerale = $funerale->luogo.' (<b>'.$funerale->data.'</b> '.$funerale->ora_da.')';
-                $dati_feretro  = $feretro->luogo.' (<b>'.$feretro->data.'</b> '.$feretro->ora_da.')';
-                $dati_rosario  = $rosario->luogo.' (<b>'.$rosario->data.'</b> '.$rosario->ora_da.')';
+                $dati_funerale = esc_html($funerale->luogo) . ' (<b>' . esc_html($funerale->data) . '</b> ' . esc_html($funerale->ora_da) . ')';
+                $dati_feretro  = esc_html($feretro->luogo) . ' (<b>' . esc_html($feretro->data) . '</b> ' . esc_html($feretro->ora_da) . ')';
+                $dati_rosario  = esc_html($rosario->luogo) . ' (<b>' . esc_html($rosario->data) . '</b> ' . esc_html($rosario->ora_da) . ')';
 
-                $azioni = '<a target="_blank" href="'.$portale_url.'">edita sul portale</a>';
+                $azioni = '<a target="_blank" href="' . esc_url($portale_url) . '">edita sul portale</a>';
                 
                 $num_cordo = count($cer->cordogli->email) + count($cer->cordogli->pdf) + count($cer->cordogli->whatsapp);
 
                 if ($num_cordo) {
-                    $azioni .= ' | <a href="'.$cordogli_url.$cer->slug.'">vedi i cordogli</a>';
+                    $azioni .= ' | <a href="' . esc_url($cordogli_url . $cer->slug) . '">vedi i cordogli</a>';
                 }
                 
                 $thumb = PortaleFunebre_API::GetImgUrl($cer->thumbnail);
 
-                $img = '<img src="'.$thumb.'" style="width: 40px"/>';
+                $img = '<img src="' . esc_url($thumb) . '" style="width: 40px"/>';
 
-                echo '<tr><td>'.$img.'</td><td><b>'.$cer->nome_defunto.'</b></td><td>'.$dati_funerale.'</td><td>'.$dati_funerale.'</td><td>'.$dati_funerale.'</td><td>'.$azioni.'</td></tr>';
+                echo '<tr><td>' . wp_kses_post($img) . '</td><td><b>' . esc_html($cer->nome_defunto) . '</b></td><td>' . wp_kses_post($dati_funerale) . '</td><td>' . wp_kses_post($dati_funerale) . '</td><td>' . wp_kses_post($dati_funerale) . '</td><td>' . wp_kses_post($azioni) . '</td></tr>';
 
 
             }
