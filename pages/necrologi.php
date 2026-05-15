@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 use function Digitalia\get_plugin_page_url;
 

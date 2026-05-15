@@ -1,5 +1,4 @@
-<?php
-/*
+<?php /*
 Plugin Name: Portale Funebre Necrologi
 Plugin URI: http://www.portalefunebre.com
 Description: Gestione dei necrologi sul tuo sito.
@@ -13,15 +12,6 @@ if (!defined('ABSPATH')) { exit; }
 
 define('PORTALE_FUNEBRE_API_INCLUDED', true);
 
-if (!PORTALE_FUNEBRE_API_INCLUDED) {
-    
-    $fakeApiPath = 'C:\www\FunebreIntegrator';
-
-    require_once($fakeApiPath.'\PortaleFunebre_API.php');
-    require_once($fakeApiPath.'\config.php');
-
-}
-
 require_once('plugin_core/plugin_load.php');
 
 if (!class_exists('PortaleFunebre_API')) {
@@ -30,7 +20,7 @@ if (!class_exists('PortaleFunebre_API')) {
 
 add_action( 'gestione_necrologi_head_left', function () {
     $link = PortaleFunebre_API::GetLoginPath();
-    echo '<p class="titolo-portale">Accedi al portale</p><a href="'.esc_url_raw($link).'" target="__blank" class="button">Accedi ora</a>';
+    echo '<p class="titolo-portale">Accedi al portale</p><a href="' . esc_url($link) . '" target="_blank" rel="noopener noreferrer" class="button">Accedi ora</a>';
 
 });
 
@@ -38,7 +28,8 @@ add_action('template_redirect', function () {
 
     if (isset($_SERVER['REQUEST_URI'])) {
 
-        $url_string = (trim(wp_parse_url(esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])), PHP_URL_PATH), '/'));
+        $request_uri = sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI']));
+        $url_string  = (trim(wp_parse_url($request_uri, PHP_URL_PATH), '/'));
 
         $url_routes = explode('/',$url_string);
         // Controlla se la route è "portalefunebre"
@@ -153,15 +144,9 @@ class GestioneNecrologi extends Digitalia\PluginBase {
                 if (!$desc) {
                     $desc = 'E\' mancato/a all\'affetto dei suoi cari '.$data->nome_defunto;
                 }
-                $url      = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                $url      = home_url('/pf-share/'.$slug);
                 $real_url = esc_url(home_url('/'.self::$IMPOSTAZIONI['slug_singolo'].'/'.$slug));
 
-                if (isset($_GET['dev-test'])) {
-
-                    echo $desc;
-                    echo '<img src="'.esc_url($img).'"/>';
-                    die();
-                }
                 /*
                         <meta http-equiv="refresh" content="0;url=<?php echo $real_url; ?>">
                 */
@@ -184,7 +169,7 @@ class GestioneNecrologi extends Digitalia\PluginBase {
 
                         <!-- X (Twitter) -->
                         <meta property="twitter:card" content="<?php echo esc_attr($title); ?>" />
-                        <meta property="twitter:url" content="<?php echo $real_url; ?>" />
+                        <meta property="twitter:url" content="<?php echo esc_url($real_url); ?>" />
                         <meta property="twitter:title" content="<?php echo esc_attr($title); ?>" />
                         <meta property="twitter:description" content="<?php echo esc_attr($desc); ?>" />
                         <meta property="twitter:image" content="<?php echo esc_url($img); ?>" />
@@ -199,7 +184,7 @@ class GestioneNecrologi extends Digitalia\PluginBase {
                         <p><?php echo esc_attr($desc); ?></p>
                         <img src="<?php echo esc_url($img); ?>"/>
                         <script>
-                            window.location.href = "<?php echo $real_url; ?>";
+                            window.location.href = <?php echo wp_json_encode($real_url); ?>;
                         </script>
                     </body>
                 </html>

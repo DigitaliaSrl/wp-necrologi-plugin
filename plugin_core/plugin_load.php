@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 // Evita l'accesso diretto al file
 if (!defined('ABSPATH')) { exit; }

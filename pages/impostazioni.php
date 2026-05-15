@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 use function Digitalia\get_plugin_asset_url as get_asset_url;
 
@@ -108,47 +108,66 @@ $massimizza_foto = (isset($impostazioni['massimizza_foto'])) ? boolval($impostaz
 
 
 if (isset($_POST['cambia_impostazioni'])) {
-    
-    $tipo_vis        = $_POST['tipo_vis'];
-    $colore_box      = $_POST['colore_box'];
-    $colore_page     = $_POST['colore_page'];
-    $profilo_box     = $_POST['profilo_box'];
-    $link_gdpr       = $_POST['link_gdpr'];
+
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('Non hai i permessi per modificare queste impostazioni.', 'gestione_necrologi'));
+    }
+
+    check_admin_referer('gestione_necrologi_save_settings', 'gestione_necrologi_nonce');
+
+    $posted = wp_unslash($_POST);
+
+    $field = static function ($key, $default = '') use ($posted) {
+        return isset($posted[$key]) ? sanitize_text_field($posted[$key]) : $default;
+    };
+    $checkbox = static function ($key) use ($posted) {
+        return (isset($posted[$key]) && $posted[$key]) ? '1' : '0';
+    };
+    $color = static function ($key, $default) use ($field) {
+        $value = sanitize_hex_color($field($key, $default));
+        return $value ? $value : $default;
+    };
+
+    $tipo_vis        = $field('tipo_vis', 'grid');
+    $colore_box      = $color('colore_box', '#f7f6ed');
+    $colore_page     = $color('colore_page', '#f9eee4');
+    $profilo_box     = $field('profilo_box', 'verticale');
+    $link_gdpr       = esc_url_raw($field('link_gdpr'));
     //$num_cols        = $_POST['num_cols'];
-    $colore_testo    = $_POST['colore_testo'];
-    $api_key         = $_POST['api_key'];
-    $client_id       = $_POST['client_id'];
-    $slug_singolo    = $_POST['slug_singolo'];
-    $cerimonia       = $_POST['cerimonia'];
-    $rosario         = $_POST['rosario'];
-    $titolo_hero     = sanitize_text_field($_POST['titolo_hero']);
-    $testo_hero      = sanitize_text_field($_POST['testo_hero']);
-    $sfondo_hero     = intval($_POST['sfondo_hero']);
-    
-    $slide_res_desktop     = $_POST['slide_res_desktop'];
-    $slide_res_tablet      = $_POST['slide_res_tablet'];
-    $slide_res_mobile      = $_POST['slide_res_mobile'];
-    $slide_cerimonia       = $_POST['slide_cerimonia'];
-    $slide_rosario         = $_POST['slide_rosario'];
-    $slide_mostra_decesso  = (isset($_POST['slide_mostra_decesso']) && $_POST['slide_mostra_decesso']) ? '1' : '0';
-    $slide_mostra_eta      = (isset($_POST['slide_mostra_eta']) && $_POST['slide_mostra_eta']) ? '1' : '0';
-    $slide_mostra_orari    = (isset($_POST['slide_mostra_orari']) && $_POST['slide_mostra_orari']) ? '1' : '0';
-    $slide_mostra_dettagli = (isset($_POST['slide_mostra_dettagli']) && $_POST['slide_mostra_dettagli']) ? '1' : '0';
-    
-    $mostra_decesso  = (isset($_POST['mostra_decesso']) && $_POST['mostra_decesso']) ? '1' : '0';
-    $mostra_eta      = (isset($_POST['mostra_eta']) && $_POST['mostra_eta']) ? '1' : '0';
-    $eta_su_singolo  = (isset($_POST['eta_su_singolo']) && $_POST['eta_su_singolo']) ? '1' : '0';
-    $mostra_donazioni= (isset($_POST['mostra_donazioni']) && $_POST['mostra_donazioni']) ? '1' : '0';
-    $mostra_orari    = (isset($_POST['mostra_orari']) && $_POST['mostra_orari']) ? '1' : '0';
-    $mostra_dettagli = (isset($_POST['mostra_dettagli']) && $_POST['mostra_dettagli']) ? '1' : '0';
-    $con_bottone     = (isset($_POST['con_bottone']) && $_POST['con_bottone']) ? '1' : '0';
-    $form_come_popup = (isset($_POST['form_come_popup']) && $_POST['form_come_popup']) ? '1' : '0';
-    $share_on_fb     = (isset($_POST['share_on_fb']) && $_POST['share_on_fb']) ? '1' : '0';
-    $share_on_tw     = (isset($_POST['share_on_tw']) && $_POST['share_on_tw']) ? '1' : '0';
-    $share_on_wa     = (isset($_POST['share_on_wa']) && $_POST['share_on_wa']) ? '1' : '0';
-    $defunto_in_hero = (isset($_POST['defunto_in_hero']) && $_POST['defunto_in_hero']) ? '1' : '0';
-    $massimizza_foto = (isset($_POST['massimizza_foto']) && $_POST['massimizza_foto']) ? '1' : '0';
-    $single_layout   = (isset($_POST['single_layout'])) ? $_POST['single_layout'] : '1';
+    $colore_testo    = $color('colore_testo', '#1d1d1d');
+    $api_key         = $field('api_key');
+    $client_id       = $field('client_id');
+    $slug_singolo    = sanitize_title($field('slug_singolo', 'necrologio'));
+    $cerimonia       = $field('cerimonia');
+    $rosario         = $field('rosario');
+    $titolo_hero     = $field('titolo_hero');
+    $testo_hero      = $field('testo_hero');
+    $sfondo_hero     = absint($field('sfondo_hero'));
+
+    $slide_res_desktop     = $field('slide_res_desktop', '4');
+    $slide_res_tablet      = $field('slide_res_tablet', '3');
+    $slide_res_mobile      = $field('slide_res_mobile', '2');
+    $slide_cerimonia       = $field('slide_cerimonia');
+    $slide_rosario         = $field('slide_rosario');
+    $slide_mostra_decesso  = $checkbox('slide_mostra_decesso');
+    $slide_mostra_eta      = $checkbox('slide_mostra_eta');
+    $slide_mostra_orari    = $checkbox('slide_mostra_orari');
+    $slide_mostra_dettagli = $checkbox('slide_mostra_dettagli');
+
+    $mostra_decesso  = $checkbox('mostra_decesso');
+    $mostra_eta      = $checkbox('mostra_eta');
+    $eta_su_singolo  = $checkbox('eta_su_singolo');
+    $mostra_donazioni= $checkbox('mostra_donazioni');
+    $mostra_orari    = $checkbox('mostra_orari');
+    $mostra_dettagli = $checkbox('mostra_dettagli');
+    $con_bottone     = $checkbox('con_bottone');
+    $form_come_popup = $checkbox('form_come_popup');
+    $share_on_fb     = $checkbox('share_on_fb');
+    $share_on_tw     = $checkbox('share_on_tw');
+    $share_on_wa     = $checkbox('share_on_wa');
+    $defunto_in_hero = $checkbox('defunto_in_hero');
+    $massimizza_foto = $checkbox('massimizza_foto');
+    $single_layout   = $field('single_layout', '1');
 
     $impostazioni['tipo_visualizzazione'] = $tipo_vis;
     
@@ -210,6 +229,7 @@ if (isset($_POST['cambia_impostazioni'])) {
 ?>
 
 <form method="POST">
+    <?php wp_nonce_field('gestione_necrologi_save_settings', 'gestione_necrologi_nonce'); ?>
 
     <div class="impostazioni-header">
 

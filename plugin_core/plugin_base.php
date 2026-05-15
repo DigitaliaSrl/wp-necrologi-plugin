@@ -30,14 +30,21 @@ function get_plugin_asset_url($name) {
 
 function dg_ajax_plugin_base() {
 
-    $azione = sanitize_text_field($_POST['dgplugin_action']);
+    if (!check_ajax_referer('dg_ajax_plugin_base', 'nonce', false)) {
+        wp_send_json_error(['message' => 'Nonce non valido.'], 403);
+    }
+
+    $request = wp_unslash($_POST);
+    $azione  = isset($request['dgplugin_action']) ? sanitize_key($request['dgplugin_action']) : '';
 
     if (isset(PluginBase::$ACTIONS[$azione])) {
 
-        $res = PluginBase::$ACTIONS[$azione]($_POST);
+        $res = PluginBase::$ACTIONS[$azione]($request);
         wp_send_json_success($res);
 
     }
+
+    wp_send_json_error(['message' => 'Azione non valida.'], 400);
 
 }
 add_action('wp_ajax_dg_ajax_plugin_base', __NAMESPACE__ . '\\dg_ajax_plugin_base');
@@ -128,16 +135,20 @@ class PluginBase {
             add_action('admin_enqueue_scripts', function ($hook) use ($plug_fold_name) {
                 // Carica solo per le pagine del plugin
                 if (strpos($hook, $this->slug) !== false) {
-                    wp_enqueue_style($this->slug.'-backend',  plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/backend.css');
-                    wp_enqueue_script($this->slug.'-backend', plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/backend.js', array('jquery'), null, true);
+                    $backend_css_path = $this->plug_dir . '/scripts/backend.css';
+                    $backend_js_path  = $this->plug_dir . '/scripts/backend.js';
+                    wp_enqueue_style($this->slug.'-backend',  plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/backend.css', [], file_exists($backend_css_path) ? filemtime($backend_css_path) : false);
+                    wp_enqueue_script($this->slug.'-backend', plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/backend.js', array('jquery'), file_exists($backend_js_path) ? filemtime($backend_js_path) : false, true);
                 }
             });
 
         }
 
         add_action('wp_enqueue_scripts', function () use ($plug_fold_name) {
-            wp_enqueue_style($this->slug.'-frontend',  plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/frontend.css');
-            wp_enqueue_script($this->slug.'-frontend', plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/frontend.js', array('jquery'), null, true);
+            $frontend_css_path = $this->plug_dir . '/scripts/frontend.css';
+            $frontend_js_path  = $this->plug_dir . '/scripts/frontend.js';
+            wp_enqueue_style($this->slug.'-frontend',  plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/frontend.css', [], file_exists($frontend_css_path) ? filemtime($frontend_css_path) : false);
+            wp_enqueue_script($this->slug.'-frontend', plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/frontend.js', array('jquery'), file_exists($frontend_js_path) ? filemtime($frontend_js_path) : false, true);
         });
 
         add_action('wp_head', function () { ?>
@@ -146,11 +157,12 @@ class PluginBase {
 
                     window.DgPlugin = new function () {
 
-                        let plug_vars = <?php echo json_encode(self::$GLOBAL_OBJ_VARS); ?>;
+                        let plug_vars = <?php echo wp_json_encode(self::$GLOBAL_OBJ_VARS); ?>;
 
                         /*this.img_url  = '< ?php echo self::GetImgUrl(''); ? >';*/
                         this.site_url = <?php echo wp_json_encode(get_site_url()); ?>;
                         let ajax_url  = <?php echo wp_json_encode(admin_url('admin-ajax.php')); ?>;
+                        let ajax_nonce = <?php echo wp_json_encode(wp_create_nonce('dg_ajax_plugin_base')); ?>;
 
                         this.get_var = function (vname) { return plug_vars[vname]; }
 
@@ -160,7 +172,8 @@ class PluginBase {
 
                             let dati_call = {
                                 action: 'dg_ajax_plugin_base',
-                                dgplugin_action: action_required
+                                dgplugin_action: action_required,
+                                nonce: ajax_nonce
                             };
 
                             if (data_c) { for (let i in data_c) { dati_call[i] = data_c[i]; } }
