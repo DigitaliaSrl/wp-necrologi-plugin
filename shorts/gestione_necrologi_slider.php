@@ -2,9 +2,9 @@
 
 if (!defined('ABSPATH')) { exit; }
 
-if (!GestioneNecrologi::IsConfigurato()) {  echo 'slider'; return; }
+if (!PortaleFunebreNecrologi::IsConfigurato()) {  echo 'slider'; return; }
 
-$impostazioni = GestioneNecrologi::GetImpostazioni();
+$impostazioni = PortaleFunebreNecrologi::GetImpostazioni();
 
 $tipo_vis     = (isset($impostazioni['tipo_visualizzazione'])) ? $impostazioni['tipo_visualizzazione'] :'grid';
 $slug_singolo = (isset($impostazioni['slug_singolo']))  ? $impostazioni['slug_singolo'] : 'necrologio';
@@ -35,75 +35,13 @@ $arrowRight = '<svg xmlns="http://www.w3.org/2000/svg" width="25px" xmlns:xlink=
 <div class="necrologi-loader"><div class="dg_spinner"></div></div>
 
 <?php ?>
-<div class="lista-necrologi slider"></div>
-<script>
-
-    jQuery(document).ready(function ($) {
-
-        $loader = $('.necrologi-loader');
-        $looper = $('.lista-necrologi');
-
-        DgNecrologi.slugs = {
-            slug_singolo: <?php echo wp_json_encode($slug_singolo); ?>
-        };
-    
-        DgPlugin.ajax('get_anteprima_necrologi',function (cerimonie) {
-
-            console.log(cerimonie);
-
-            for (let i in cerimonie) {
-                if (cerimonie[i].nome_defunto) {
-                    let n_div = DgNecrologi.crea_necrologio_slide(cerimonie[i]);
-                    $looper.append(n_div);
-                }
-            }
-
-            $loader.css({display: 'none'});
-            let $slider = $('.lista-necrologi.slider');
-
-            if (typeof $slider.slick == 'function') {
-
-                let $theSlide = $slider.slick({
-                    dots: false,
-                    infinite: true,
-                    speed: 300,
-                    slidesToShow: <?php echo intval(ceil($slide_res_desktop * 1.14)); ?>,
-                    prevArrow: <?php echo wp_json_encode('<button class="slick-prev" aria-label="Previous">' . $arrowLeft . '</button>'); ?>,
-                    nextArrow: <?php echo wp_json_encode('<button class="slick-next" aria-label="Next">' . $arrowRight . '</button>'); ?>,
-                    slidesToScroll: 1,
-                    responsive: [
-                        {
-                            breakpoint: 1980,
-                            settings: {
-                                slidesToShow: <?php echo absint($slide_res_desktop); ?>,
-                            }
-                        },
-                        {
-                            breakpoint: 1280,
-                            settings: {
-                                slidesToShow: <?php echo absint($slide_res_tablet); ?>,
-                            }
-                        },
-                        {
-                            breakpoint: 768,
-                            settings: {
-                                slidesToShow: <?php echo absint($slide_res_mobile); ?>,
-                            }
-                        },
-                        {
-                            breakpoint: 480,
-                            settings: {
-                                slidesToShow: 1,
-                            }
-                        }
-                    ]
-                });
-
-            }
-        
-        });
-        
-
-    });
-
-</script>
+<div
+    class="lista-necrologi slider"
+    data-pfn-slider="1"
+    data-slug-singolo="<?php echo esc_attr($slug_singolo); ?>"
+    data-slide-desktop="<?php echo esc_attr(absint($slide_res_desktop)); ?>"
+    data-slide-tablet="<?php echo esc_attr(absint($slide_res_tablet)); ?>"
+    data-slide-mobile="<?php echo esc_attr(absint($slide_res_mobile)); ?>"
+    data-prev-arrow="<?php echo esc_attr('<button class="slick-prev" aria-label="Previous">' . $arrowLeft . '</button>'); ?>"
+    data-next-arrow="<?php echo esc_attr('<button class="slick-next" aria-label="Next">' . $arrowRight . '</button>'); ?>">
+</div>

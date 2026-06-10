@@ -1,5 +1,5 @@
 === Portale Funebre Necrologi ===
-Contributors: arseni filipov, jacopo zane
+Contributors: digitaliasrl, arseni filipov, jacopo zane
 Tags: obituaries, condolences, funeral, memorials, necrologi
 Requires at least: 6.0
 Tested up to: 7.0

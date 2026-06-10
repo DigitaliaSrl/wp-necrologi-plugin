@@ -1,6 +1,6 @@
 <?php 
 
-namespace Digitalia;
+namespace PortaleFunebreNecrologi;
 
 if (!defined('ABSPATH')) { exit; }
 

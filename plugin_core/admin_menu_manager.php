@@ -1,6 +1,6 @@
 <?php 
 
-namespace Digitalia;
+namespace PortaleFunebreNecrologi;
 
 // Evita l'accesso diretto al file
 if (!defined('ABSPATH')) { exit; }
@@ -50,7 +50,7 @@ abstract class AdminMenuManager {
         echo '<h1>' . esc_html(PluginBase::get_plugin_name()) . ': ' . esc_html($nomePagina) . '</h1>
         <p style="margin-top: 0px;">v' . esc_html(PluginBase::get_version()) . ' di <i>' . wp_kses_post(PluginBase::get_author()) . '</i></p></div>';
         echo '<div class="right">';
-        do_action('gestione_necrologi_head_left');
+        do_action('portale_funebre_necrologi_head_left');
         echo '</div></div><hr>';
         include_once($file);
         echo '</div>';

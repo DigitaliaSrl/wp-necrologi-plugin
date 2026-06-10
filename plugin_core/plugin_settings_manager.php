@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) { exit; }
 
 /*
-namespace Digitalia;
+namespace PortaleFunebreNecrologi;
 
 class PluginSettingsWrapper {
 

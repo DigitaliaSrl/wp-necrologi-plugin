@@ -1,14 +1,14 @@
 <?php 
 
-use function Digitalia\get_plugin_page_url;
+use function PortaleFunebreNecrologi\get_plugin_page_url;
 
 if (!defined('ABSPATH')) { exit; }
 
-$api = new PortaleFunebre_API();
+$api = new PortaleFunebreNecrologi_API();
 
 $cerimonie = $api->TrovaTuttiNecrologi(true);
 
-$portale_url  = PortaleFunebre_API::GetEndPoint().'/area-riservata';
+$portale_url  = PortaleFunebreNecrologi_API::GetEndPoint().'/area-riservata';
 $cordogli_url = get_plugin_page_url('cordogli').'&defunto=';
 
 ?>
@@ -33,10 +33,10 @@ $cordogli_url = get_plugin_page_url('cordogli').'&defunto=';
                 $num_cordo = count($cer->cordogli->email) + count($cer->cordogli->pdf) + count($cer->cordogli->whatsapp);
 
                 if ($num_cordo) {
-                    $azioni .= ' | <a href="' . esc_url($cordogli_url . $cer->slug) . '">vedi i cordogli</a>';
+                    $azioni .= ' | <a href="' . esc_url(wp_nonce_url($cordogli_url . $cer->slug, 'portale_funebre_necrologi_view_condolences')) . '">vedi i cordogli</a>';
                 }
                 
-                $thumb = PortaleFunebre_API::GetImgUrl($cer->thumbnail);
+                $thumb = PortaleFunebreNecrologi_API::GetImgUrl($cer->thumbnail);
 
                 $img = '<img src="' . esc_url($thumb) . '" style="width: 40px"/>';
 

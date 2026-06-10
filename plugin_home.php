@@ -1,15 +1,15 @@
 <?php 
 
-use function Digitalia\get_plugin_asset_url as get_asset_url;
-use function Digitalia\get_plugin_page_url;
+use function PortaleFunebreNecrologi\get_plugin_asset_url as get_asset_url;
+use function PortaleFunebreNecrologi\get_plugin_page_url;
 
 if (!defined('ABSPATH')) { exit; }
 
 $img_url = get_asset_url('digitalia_bg.jpg');
 
-$plugin_instance = Digitalia\PluginBase::get_instance();
+$plugin_instance = PortaleFunebreNecrologi\PluginBase::get_instance();
 
-$api = new PortaleFunebre_API();
+$api = new PortaleFunebreNecrologi_API();
 
 $stats = $api->TrovaStatistiche();
 
@@ -27,10 +27,10 @@ $impostazioni    = get_plugin_page_url('impostazioni');
             <div class="welcome-panel-header-image">
                 <img src="<?php echo esc_url($img_url); ?>"/>
             </div>
-            <h2><?php echo esc_html(Digitalia\PluginBase::get_plugin_name()); ?></h2>
-            <p><?php echo esc_html(Digitalia\PluginBase::get_description()); ?></p>
+            <h2><?php echo esc_html(PortaleFunebreNecrologi\PluginBase::get_plugin_name()); ?></h2>
+            <p><?php echo esc_html(PortaleFunebreNecrologi\PluginBase::get_description()); ?></p>
         </div>
-        <?php  if (!GestioneNecrologi::IsConfigurato()) { ?>
+        <?php  if (!PortaleFunebreNecrologi::IsConfigurato()) { ?>
             <div class="welcome-panel-container">
                 <div class="pf-banner-container">
                     <div class="pf-banner-content">

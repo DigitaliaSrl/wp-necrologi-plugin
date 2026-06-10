@@ -1,14 +1,23 @@
 <?php 
 
-use function Digitalia\get_plugin_page_url;
+use function PortaleFunebreNecrologi\get_plugin_page_url;
 
 if (!defined('ABSPATH')) { exit; }
 
-$api = new PortaleFunebre_API();
+$api = new PortaleFunebreNecrologi_API();
 
 $cordogli_url = get_plugin_page_url('cordogli').'&defunto=';
 
-$defunto_slug = (isset($_GET['defunto'])) ? sanitize_text_field(wp_unslash($_GET['defunto'])) : '';
+$defunto_slug = '';
+
+if (isset($_GET['defunto'])) {
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('Non hai i permessi per visualizzare questi cordogli.', 'portale-funebre-necrologi'));
+    }
+
+    check_admin_referer('portale_funebre_necrologi_view_condolences');
+    $defunto_slug = sanitize_title(wp_unslash($_GET['defunto']));
+}
 
 if ($defunto_slug) {
     
@@ -83,9 +92,9 @@ if ($defunto_slug) {
 
                     if ($totali < 1) { continue; }
 
-                    $azioni = '<a href="' . esc_url($cordogli_url . $cer->slug) . '">vedi</a>';
+                    $azioni = '<a href="' . esc_url(wp_nonce_url($cordogli_url . $cer->slug, 'portale_funebre_necrologi_view_condolences')) . '">vedi</a>';
 
-                    $thumb = PortaleFunebre_API::GetImgUrl($cer->thumbnail);
+                    $thumb = PortaleFunebreNecrologi_API::GetImgUrl($cer->thumbnail);
 
                     $img = '<img src="' . esc_url($thumb) . '" style="width: 40px"/>';
 

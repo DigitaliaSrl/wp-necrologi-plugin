@@ -1,6 +1,6 @@
 <?php
 
-namespace Digitalia;
+namespace PortaleFunebreNecrologi;
 
 // Evita l'accesso diretto al file
 if (!defined('ABSPATH')) { exit; }
@@ -8,8 +8,10 @@ if (!defined('ABSPATH')) { exit; }
 function get_plugin_page_url($name) {
 
     if (PluginBase::$CURRENT_ACTIVE_PLUGIN) {
-        $plug_slug = str_replace(' ','-',str_replace('_','-',strtolower(PluginBase::$CURRENT_ACTIVE_PLUGIN)));
-        return admin_url('admin.php?page='.$plug_slug.'-'.$name);
+        $instance = PluginBase::get_instance();
+        if ($instance) {
+            return admin_url('admin.php?page=' . $instance->get_slug() . '-' . $name);
+        }
     }
 
     return '';
@@ -19,22 +21,50 @@ function get_plugin_page_url($name) {
 function get_plugin_asset_url($name) {
 
     if (PluginBase::$CURRENT_ACTIVE_PLUGIN) {
-        $plug_name = PluginBase::$CURRENT_ACTIVE_PLUGIN;
-        $dir = plugin_dir_url($plug_name).$plug_name;
-        return $dir.'/assets/'.$name;
+        $instance = PluginBase::get_instance();
+        if ($instance) {
+            return $instance->get_asset_url($name);
+        }
     }
 
     return '';
 
 }
 
-function dg_ajax_plugin_base() {
+function portale_funebre_necrologi_sanitize_ajax_data($data) {
 
-    if (!check_ajax_referer('dg_ajax_plugin_base', 'nonce', false)) {
+    $clean = [];
+
+    foreach ((array) $data as $key => $value) {
+        $key = sanitize_key($key);
+
+        if (is_array($value)) {
+            $clean[$key] = portale_funebre_necrologi_sanitize_ajax_data($value);
+            continue;
+        }
+
+        if ('email' === $key) {
+            $clean[$key] = sanitize_email($value);
+        } elseif (in_array($key, ['message', 'messaggio'], true)) {
+            $clean[$key] = sanitize_textarea_field($value);
+        } elseif (in_array($key, ['url', 'link'], true)) {
+            $clean[$key] = esc_url_raw($value);
+        } else {
+            $clean[$key] = sanitize_text_field($value);
+        }
+    }
+
+    return $clean;
+
+}
+
+function portale_funebre_necrologi_ajax() {
+
+    if (!check_ajax_referer('portale_funebre_necrologi_ajax', 'nonce', false)) {
         wp_send_json_error(['message' => 'Nonce non valido.'], 403);
     }
 
-    $request = wp_unslash($_POST);
+    $request = portale_funebre_necrologi_sanitize_ajax_data(wp_unslash($_POST));
     $azione  = isset($request['dgplugin_action']) ? sanitize_key($request['dgplugin_action']) : '';
 
     if (isset(PluginBase::$ACTIONS[$azione])) {
@@ -47,8 +77,8 @@ function dg_ajax_plugin_base() {
     wp_send_json_error(['message' => 'Azione non valida.'], 400);
 
 }
-add_action('wp_ajax_dg_ajax_plugin_base', __NAMESPACE__ . '\\dg_ajax_plugin_base');
-add_action('wp_ajax_nopriv_dg_ajax_plugin_base', __NAMESPACE__ . '\\dg_ajax_plugin_base');
+add_action('wp_ajax_portale_funebre_necrologi_ajax', __NAMESPACE__ . '\\portale_funebre_necrologi_ajax');
+add_action('wp_ajax_nopriv_portale_funebre_necrologi_ajax', __NAMESPACE__ . '\\portale_funebre_necrologi_ajax');
 
 
 class PluginBase {
@@ -59,8 +89,11 @@ class PluginBase {
     private $dbMan=null;
 
     private $plug_dir = '';
+    private $plug_url = '';
+    private $main_plugin_file = '';
     private static $PLUGDATA = [];
     public static  $ACTIONS=[];
+    private static $CSS_VARIABLES=[];
     private $plugin_icon = 'dashicons-admin-home';
 
     private static $INST = null;
@@ -74,16 +107,18 @@ class PluginBase {
     }
 
 
-    function __construct($plugin_name, $main_plugin_file, $icona='dashicons-admin-home') {
+    function __construct($plugin_name, $main_plugin_file, $icona='dashicons-admin-home', array $legacy_slugs = []) {
 
         $plugin_dir = dirname($main_plugin_file);
 
         $this->plug_dir    = $plugin_dir;
+        $this->plug_url    = plugin_dir_url($main_plugin_file);
+        $this->main_plugin_file = $main_plugin_file;
         $this->plugin_name = $plugin_name;
         $this->plugin_icon = $icona;
 
         $this->slug  = sanitize_title($plugin_name);
-        $this->dbMan = new DbOpzioniPlugin($this->slug);
+        $this->dbMan = new DbOpzioniPlugin($this->slug, $legacy_slugs);
 
         $main_class = $this;
         register_activation_hook($main_plugin_file, function () {
@@ -137,8 +172,10 @@ class PluginBase {
                 if (strpos($hook, $this->slug) !== false) {
                     $backend_css_path = $this->plug_dir . '/scripts/backend.css';
                     $backend_js_path  = $this->plug_dir . '/scripts/backend.js';
-                    wp_enqueue_style($this->slug.'-backend',  plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/backend.css', [], file_exists($backend_css_path) ? filemtime($backend_css_path) : false);
-                    wp_enqueue_script($this->slug.'-backend', plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/backend.js', array('jquery'), file_exists($backend_js_path) ? filemtime($backend_js_path) : false, true);
+                    $backend_style_handle = $this->slug . '-backend';
+                    wp_enqueue_style($backend_style_handle,  $this->plug_url . 'scripts/backend.css', [], file_exists($backend_css_path) ? filemtime($backend_css_path) : false);
+                    wp_enqueue_script($this->slug.'-backend', $this->plug_url . 'scripts/backend.js', array('jquery'), file_exists($backend_js_path) ? filemtime($backend_js_path) : false, true);
+                    wp_add_inline_style($backend_style_handle, self::get_css_variables());
                 }
             });
 
@@ -147,52 +184,18 @@ class PluginBase {
         add_action('wp_enqueue_scripts', function () use ($plug_fold_name) {
             $frontend_css_path = $this->plug_dir . '/scripts/frontend.css';
             $frontend_js_path  = $this->plug_dir . '/scripts/frontend.js';
-            wp_enqueue_style($this->slug.'-frontend',  plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/frontend.css', [], file_exists($frontend_css_path) ? filemtime($frontend_css_path) : false);
-            wp_enqueue_script($this->slug.'-frontend', plugin_dir_url('') . '/' . $plug_fold_name . '/scripts/frontend.js', array('jquery'), file_exists($frontend_js_path) ? filemtime($frontend_js_path) : false, true);
+            $frontend_style_handle = $this->slug . '-frontend';
+            $frontend_script_handle = $this->slug . '-frontend';
+            wp_enqueue_style($frontend_style_handle,  $this->plug_url . 'scripts/frontend.css', [], file_exists($frontend_css_path) ? filemtime($frontend_css_path) : false);
+            wp_enqueue_script($frontend_script_handle, $this->plug_url . 'scripts/frontend.js', array('jquery'), file_exists($frontend_js_path) ? filemtime($frontend_js_path) : false, true);
+            wp_localize_script($frontend_script_handle, 'portaleFunebreNecrologiData', [
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce'   => wp_create_nonce('portale_funebre_necrologi_ajax'),
+                'siteUrl' => get_site_url(),
+                'vars'    => self::$GLOBAL_OBJ_VARS,
+            ]);
+            wp_add_inline_style($frontend_style_handle, self::get_css_variables());
         });
-
-        add_action('wp_head', function () { ?>
-            <script>
-                (function ($) {
-
-                    window.DgPlugin = new function () {
-
-                        let plug_vars = <?php echo wp_json_encode(self::$GLOBAL_OBJ_VARS); ?>;
-
-                        /*this.img_url  = '< ?php echo self::GetImgUrl(''); ? >';*/
-                        this.site_url = <?php echo wp_json_encode(get_site_url()); ?>;
-                        let ajax_url  = <?php echo wp_json_encode(admin_url('admin-ajax.php')); ?>;
-                        let ajax_nonce = <?php echo wp_json_encode(wp_create_nonce('dg_ajax_plugin_base')); ?>;
-
-                        this.get_var = function (vname) { return plug_vars[vname]; }
-
-                        this.ajax = function (action_required, callback, data_c) {
-
-                            if (!callback) { return; }
-
-                            let dati_call = {
-                                action: 'dg_ajax_plugin_base',
-                                dgplugin_action: action_required,
-                                nonce: ajax_nonce
-                            };
-
-                            if (data_c) { for (let i in data_c) { dati_call[i] = data_c[i]; } }
-
-                            $.ajax({
-                                type: 'POST',
-                                url:  ajax_url,
-                                data: dati_call,
-                                success: function (response) { if (!response.success) { console.log("NO SUCCESS"); } if (callback) { callback(response.data); } },
-                                error: function (error) { console.error('Error:', error); }
-                            });
-
-                        };
-
-                    };
-
-                })(jQuery);
-            </script>
-        <?php });
 
     }
 
@@ -221,12 +224,14 @@ class PluginBase {
 
     static function add_js_variables($variabili) { foreach ($variabili as $name => $data) { self::$GLOBAL_OBJ_VARS[$name] = $data; } }
 
-    static function add_css_variables($variabili) {
-        \add_action( 'wp_head', function () use ($variabili) {
-            $custom_css = '';
-            foreach ($variabili as $k => $val) { $custom_css .= "--dg-$k: $val;\n"; }
-            echo '<style>:root {' . "\n" . esc_html($custom_css) . "\n" . '</style>';
-        } );
+    static function add_css_variables($variabili) { foreach ($variabili as $name => $data) { self::$CSS_VARIABLES[$name] = $data; } }
+
+    private static function get_css_variables() {
+        $custom_css = '';
+        foreach (self::$CSS_VARIABLES as $k => $val) {
+            $custom_css .= '--dg-' . sanitize_key($k) . ': ' . sanitize_text_field($val) . ";\n";
+        }
+        return $custom_css ? ":root {\n" . $custom_css . "}\n" : '';
     }
 
     static function add_ajax_call($nome_call, $fun) { self::$ACTIONS[$nome_call] = $fun; }
@@ -250,7 +255,7 @@ class PluginBase {
             self::$INST = $this;
             self::$CURRENT_ACTIVE_PLUGIN = basename($this->plug_dir);
 
-            self::$PLUGDATA = \get_plugin_data($this->plug_dir.'/index.php');
+            self::$PLUGDATA = \get_plugin_data($this->main_plugin_file);
 
             AdminMenuManager::IncludiPaginaPlugin($this->plug_dir.'/plugin_home.php',$this->plugin_name,'Overview');
 
@@ -259,7 +264,7 @@ class PluginBase {
             self::$INST = $this;
             self::$CURRENT_ACTIVE_PLUGIN = basename($this->plug_dir);
 
-            self::$PLUGDATA = \get_plugin_data($this->plug_dir.'/index.php');
+            self::$PLUGDATA = \get_plugin_data($this->main_plugin_file);
 
             AdminMenuManager::IncludiPaginaPlugin($this->plug_dir.'/pages/'.$page_found.'.php',$this->plugin_name,$this->PAGINE[$page_found]);
         }
@@ -270,6 +275,10 @@ class PluginBase {
     public function after_uninstall() { }
     public function before_activation() { }
     public function create_menu_pages() { }
+
+    public function get_slug() { return $this->slug; }
+
+    public function get_asset_url($name) { return $this->plug_url . 'assets/' . ltrim($name, '/'); }
 
     public function create_shortcode($short_string, array $params=[]) {
 
@@ -294,7 +303,7 @@ class PluginBase {
                 }
 
             } else {
-                return '<p>Errore: Il file <strong>' . $shortcode_file . '.php</strong> non esiste.</p>';
+                return '<p>Errore: Il file <strong>' . esc_html($shortcode_file . '.php') . '</strong> non esiste.</p>';
             }
 
         });

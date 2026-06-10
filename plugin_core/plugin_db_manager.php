@@ -1,6 +1,6 @@
 <?php 
 
-namespace Digitalia;
+namespace PortaleFunebreNecrologi;
 
 // Evita l'accesso diretto al file
 if (!defined('ABSPATH')) { exit; }
@@ -9,19 +9,30 @@ if (!defined('ABSPATH')) { exit; }
 class DbOpzioniPlugin {
 
     private $table_name;
+    private $legacy_table_names = [];
 
     // Metodo costruttore della classe
-    public function __construct($table_slug) {
+    public function __construct($table_slug, array $legacy_slugs = []) {
         global $wpdb;
         $this->table_name = $wpdb->prefix . str_replace('-','_',$table_slug) . '_opzioni';
+        foreach ($legacy_slugs as $legacy_slug) {
+            $this->legacy_table_names[] = $wpdb->prefix . str_replace('-','_',$legacy_slug) . '_opzioni';
+        }
     }
 
     public function isPluginInstalled() {
+        return (bool) $this->get_active_table_name();
+    }
+
+    private function get_active_table_name() {
         global $wpdb;
-        if ($wpdb->get_var("SHOW TABLES LIKE '$this->table_name'") != $this->table_name) {
-            return false;
+        $tables = array_merge([$this->table_name], $this->legacy_table_names);
+        foreach ($tables as $table_name) {
+            if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table_name)) === $table_name) {
+                return $table_name;
+            }
         }
-        return true;
+        return '';
     }
 
     // Metodo privato per creare la tabella se non esiste
@@ -73,7 +84,8 @@ class DbOpzioniPlugin {
         if (!$this->isPluginInstalled()) {
             return null;
         }
-        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $this->table_name WHERE nome = %s", $nome), ARRAY_A);
+        $table_name = $this->get_active_table_name();
+        return $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table_name} WHERE nome = %s", $nome), ARRAY_A);
     }
 
     // Metodo per aggiornare un'entry nella tabella per nome
@@ -83,8 +95,10 @@ class DbOpzioniPlugin {
 
         $modifica = current_time('mysql');
 
+        $table_name = $this->get_active_table_name() ?: $this->table_name;
+
         $wpdb->update(
-            $this->table_name,
+            $table_name,
             [
                 'dati'     => json_encode($dati),
                 'modifica' => $modifica

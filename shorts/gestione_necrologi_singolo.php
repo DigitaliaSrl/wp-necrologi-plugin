@@ -2,9 +2,9 @@
 
 if (!defined('ABSPATH')) { exit; }
 
-if (!GestioneNecrologi::IsConfigurato()) {  echo 'necrologio'; return; }
+if (!PortaleFunebreNecrologi::IsConfigurato()) {  echo 'necrologio'; return; }
 
-$impostazioni = GestioneNecrologi::GetImpostazioni();
+$impostazioni = PortaleFunebreNecrologi::GetImpostazioni();
 
 $slug_singolo    = (isset($impostazioni['slug_singolo']))  ? $impostazioni['slug_singolo'] : 'necrologio';
 $slug_necrologio = get_query_var('necro_slug');
@@ -60,7 +60,14 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
 
 <div class="necrologi-loader"><div class="dg_spinner"></div></div>
 
-<div class="post-necrologio portale-funebre-post <?php echo esc_attr($classes); ?>" style="display: none">
+<div
+  class="post-necrologio portale-funebre-post <?php echo esc_attr($classes); ?>"
+  style="display: none"
+  data-pfn-single="1"
+  data-slug-necrologio="<?php echo esc_attr($slug_necrologio); ?>"
+  data-not-found-url="<?php echo esc_url(get_site_url().'/not-found'); ?>"
+  data-share-url="<?php echo esc_url(get_site_url() . '/pf-share/' . $slug_necrologio); ?>"
+  data-no-popup="<?php echo $mostra_come_popup ? '0' : '1'; ?>">
 
 
   <?php if ($titolo_hero || $testo_hero): ?>
@@ -254,128 +261,3 @@ $defunto_in_hero = (isset($impostazioni['defunto_in_hero'])) ? boolval($impostaz
 
 </div>
 
-
-<script>
-
-  jQuery(document).ready(function ($) {
-
-    let crea_embed_map = function (indirizzo, zoomL) {
-      let econded_ind = indirizzo.replaceAll(',','').replaceAll(' ','%20');
-      if (!zoomL) { zoomL = 14; }
-      let map_url = 'https://maps.google.com/maps?width=100%25&amp;height=450&amp;hl=en&amp;q='+econded_ind+'&amp;t=&amp;z='+zoomL+'&amp;ie=UTF8&amp;iwloc=B&amp;output=embed';
-      let map_code = '<iframe src="'+map_url+'" width="100%" height="450" style="border:0;" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>'
-      return map_code;
-    };
-
-    $loader     = $('.necrologi-loader');
-    $necroMappa = $('.necro-mappa');
-    /*$looper = $('.lista-necrologi');*/
-
-    
-    DgPlugin.ajax('get_necrologio_singolo',function (cerimonia) {
-
-      console.log(cerimonia);
-
-
-      if (!cerimonia) {
-        window.location = <?php echo wp_json_encode(get_site_url().'/not-found'); ?>;
-      }
-
-      let agenzia = 'Onoranze Funebri';
-
-      if (cerimonia.agenzia && cerimonia.agenzia.ragione_sociale) {
-        agenzia = cerimonia.agenzia.ragione_sociale;
-      }
-
-      document.title = cerimonia.nome_defunto+' - '+agenzia;
-
-      let $formCord  = $('.cordo-form-wrapper');
-      let dati_necro = DgNecrologi.crea_necrologio_singolo(cerimonia);
-      let no_PopUp   = false;
-
-      <?php if (!$mostra_come_popup) { ?>
-        no_PopUp = true;
-        $formCord.attr('active',dati_necro.mono_tipo);
-      <?php } ?>
-    
-      if (!cerimonia.cordogli.whatsapp) {
-        $('button.manda-con-whatsapp').remove();
-        $('.button.scrivi-su-whatsapp').remove();
-      } else if (cerimonia.contatto_principale.whatsapp) {
-        let link_wt = 'https://api.whatsapp.com/send?phone='+cerimonia.contatto_principale.whatsapp+'&text=';
-        $('.button.scrivi-su-whatsapp').attr('href',link_wt);
-      }
-      if (!cerimonia.cordogli.email) { $('button.manda-con-email').remove(); }
-      if (!cerimonia.cordogli.pdf) { $('button.manda-con-pdf').remove(); }
-
-      $loader.fadeOut();
-
-      if (dati_necro.has_nessun_cordoglio) {
-        $('.invia-cordoglio').remove();
-      }
-
-      if (cerimonia.mappa) {
-        $necroMappa.find('.mappa-cerimonia').html(crea_embed_map(cerimonia.mappa),14);
-      } else {
-        $necroMappa.remove();
-      }
-
-      $('.invia-cordoglio').click(function () {
-
-        if (no_PopUp) {
-          $("html, body").animate({ scrollTop: $('#form-di-cordoglio').offset().top - 70 }, 1000);
-          return;
-        }
-        if (dati_necro.is_mono) {
-          $formCord.attr('active',dati_necro.mono_tipo);
-          return;
-        }
-        $formCord.attr('active','');
-      });
-      
-      $('button.popclose').click(function () {
-        $formCord.removeAttr('active');
-      });
-
-      $('.form-buttons .manda-con-email').click(function () {
-        $formCord.attr('active','email');
-        $formCord.find('input[name="tipo"]').val('email');
-      });
-      $('.form-buttons .manda-con-pdf').click(function () {
-        $formCord.attr('active','pdf');
-        $formCord.find('input[name="tipo"]').val('pdf');
-      });
-      $('.form-buttons .manda-con-whatsapp').click(function () {
-        $formCord.attr('active','whatsapp');
-        $formCord.find('input[name="tipo"]').val('whatsapp');
-      });
-
-      $('form .invia-a-api').click(function() {
-        DgNecrologi.invia_cordoglio($formCord);
-      });
-      
-      $('.portale-funebre-post.post-necrologio').fadeIn();
-
-      const shareUrl = <?php echo wp_json_encode(get_site_url() . '/pf-share/' . $slug_necrologio); ?>;
-
-      if (cerimonia.lista_links && cerimonia.lista_links.length > 0) {
-          let $cusLinkSec = $('div.custom-links');
-          $cusLinkSec.append('<h5>Altri link</h5>');
-          let links = cerimonia.lista_links;
-          for (let i in links) {
-            $cusLinkSec.append('<a href="'+links[i].url+'" target="_blank">'+links[i].testo+'</a>');
-          }
-      }
-
-      $('.social-share .shs-icon-wrapper').each(function () {
-        $('.share-on.fb').attr('href',`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`);
-        $('.share-on.wa').attr('href',`https://wa.me/?text=${shareUrl}`);
-        $('.share-on.tw').attr('href',`https://x.com/intent/post?text=${shareUrl}`);
-      })
-
-        
-    },{ slug: <?php echo wp_json_encode($slug_necrologio); ?> });
-
-  });
-
-</script>
