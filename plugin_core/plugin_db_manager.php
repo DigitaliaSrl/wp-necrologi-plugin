@@ -84,8 +84,9 @@ class DbOpzioniPlugin {
         if (!$this->isPluginInstalled()) {
             return null;
         }
-        $table_name = $this->get_active_table_name();
-        return $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table_name} WHERE nome = %s", $nome), ARRAY_A);
+        $table_name = esc_sql($this->get_active_table_name());
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Internal table name is built from plugin-controlled slugs and escaped above; %i would require WordPress 6.2+.
+        return $wpdb->get_row($wpdb->prepare('SELECT * FROM ' . $table_name . ' WHERE nome = %s', $nome), ARRAY_A);
     }
 
     // Metodo per aggiornare un'entry nella tabella per nome

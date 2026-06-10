@@ -255,7 +255,7 @@ class PluginBase {
             self::$INST = $this;
             self::$CURRENT_ACTIVE_PLUGIN = basename($this->plug_dir);
 
-            self::$PLUGDATA = \get_plugin_data($this->main_plugin_file);
+            self::$PLUGDATA = \get_plugin_data($this->main_plugin_file, false, true);
 
             AdminMenuManager::IncludiPaginaPlugin($this->plug_dir.'/plugin_home.php',$this->plugin_name,'Overview');
 
@@ -264,7 +264,7 @@ class PluginBase {
             self::$INST = $this;
             self::$CURRENT_ACTIVE_PLUGIN = basename($this->plug_dir);
 
-            self::$PLUGDATA = \get_plugin_data($this->main_plugin_file);
+            self::$PLUGDATA = \get_plugin_data($this->main_plugin_file, false, true);
 
             AdminMenuManager::IncludiPaginaPlugin($this->plug_dir.'/pages/'.$page_found.'.php',$this->plugin_name,$this->PAGINE[$page_found]);
         }
