@@ -15,7 +15,7 @@ define('PORTALE_FUNEBRE_NECROLOGI_API_INCLUDED', true);
 require_once('plugin_core/plugin_load.php');
 
 if (!class_exists('PortaleFunebreNecrologi_API')) {
-    require_once plugin_dir_path(__FILE__) . 'inc/funebreapi/PortaleFunebre_API.php';
+    require_once plugin_dir_path(__FILE__) . 'inc/funebreapi/PortaleFunebreNecrologi_API.php';
 }
 
 add_action( 'portale_funebre_necrologi_head_left', function () {
