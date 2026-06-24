@@ -59,7 +59,8 @@ class PortaleFunebreNecrologi extends PortaleFunebreNecrologi\PluginBase {
         if (!isset(self::$IMPOSTAZIONI['api_key']) || !self::$IMPOSTAZIONI['api_key']|| !self::$IMPOSTAZIONI['client_id']) { return; }
         
         PortaleFunebreNecrologi_API::Config([
-            'END_POINT' => 'https://portalefunebre.com',
+            //'END_POINT' => 'https://portalefunebre.com',
+            'END_POINT' => 'http://localhost/repos/prt_fun/public',
             'CLIENT_ID' => self::$IMPOSTAZIONI['client_id'],
             'API_KEY'   => self::$IMPOSTAZIONI['api_key'],
         ]);
